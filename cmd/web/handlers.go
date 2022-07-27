@@ -4,41 +4,48 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 type TemplateData struct {
-	Guide Guide
+	Guides []*Guide
+	Text   string
 }
 
 type Guide struct {
+	Id      int
 	Title   string
 	Content string
 	Author  string
+	Created time.Time
+	Updated time.Time
 }
 
 func HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
-
-	tp, err := template.ParseFiles("./ui/templates/home.tmpl")
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+	td := TemplateData{
+		Text: "hello this text should be deleted until .. . . .  . ..  .. . .",
 	}
-	err = tp.Execute(w, "Hello")
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	render(w, "./ui/templates/home.tmpl", td)
 }
+
+func CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
+	td := TemplateData{
+		Text: "hello guide",
+	}
+	render(w, "./ui/templates/createguide.tmpl", td)
+}
+
+var td TemplateData
 
 func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
-	td := TemplateData{
-		Guide: Guide{
-			Title:   "The Great",
-			Content: "Lirum ipsum trallalala",
-			Author:  "Jk Rowling",
-		},
+	if r.FormValue("title") != "" && r.FormValue("content") != "" {
+		td.Guides = append(td.Guides, &Guide{
+			Title:   r.FormValue("title"),
+			Content: r.FormValue("content"),
+			Author:  "Anon",
+		})
+
 	}
 
 	render(w, "./ui/templates/showguides.tmpl", td)
@@ -46,7 +53,7 @@ func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
 func render(w http.ResponseWriter, filename string, td TemplateData) {
 
-	tp, err := template.ParseFiles(filename)
+	tp, err := template.ParseFiles(filename, "./ui/templates/base.layout.tmpl")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
