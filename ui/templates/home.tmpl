@@ -3,6 +3,11 @@
 {{define "title"}}₿ @ Home{{end}}
 {{define "body"}}
 <h1>@home</h1><br>
-<p>{{.Text}}</p>
+
+<p>{{.Guide.Title}}</p>
+<p>{{.Guide.Content}}</p>
+<p>{{.Guide.Author}}</p>
+<p>{{humandate .Guide.Created}}</p>
+
 {{end}}
 

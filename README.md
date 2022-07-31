@@ -10,8 +10,9 @@
 
 ### Roadmap
 #### 1. Post Guides
-- Build bare minimum to post something -> html forms 
+- Build bare minimum to post something 
 - Create a DB to post guides -> Title, Content, Created_at, Creator
+- -> html forms -> content with markdown enabled -> save content as plain markdown in db -> render it to html as html.ResponseWriter to display at page
 #### 2. Create User
 - connect to DB for authenication?
 

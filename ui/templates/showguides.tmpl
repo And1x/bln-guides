@@ -4,9 +4,11 @@
 
     <h1>Guides:</h1>
 {{range .Guides}}
-    <h3>{{.Title}}</h3>
-    <p>{{.Content}}</p>
-    <p>By: {{.Author}}</p>
+    <h2>Title: {{.Title}}</h2>
+    {{.Content}} <br>
+    <p></p>
+    By: {{.Author}} <br>
+    Created: {{humandate .Created}}
     <p>________________________</p>
 {{end}}
 {{end}}
