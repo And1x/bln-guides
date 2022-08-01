@@ -1,31 +1,39 @@
 package postgres
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
+	"html/template"
+	"log"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 )
 
 type GuidesModel struct {
 	DB *sql.DB
 }
 
-func (g *GuidesModel) GetById(id int) (*models.Guide, error) {
+// GetById returns a Guide by ID - if inHtml==true then convertes content from md to Html
+func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, author, created, updated FROM guides WHERE id= $1`
+	stmt := `SELECT id, title, content, author, created, updated FROM guides WHERE id = $1`
 
 	row := g.DB.QueryRow(stmt, id)
 
 	mg := &models.Guide{}
-	//var mg models.Guide
 
 	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.Author, &mg.Created, &mg.Updated)
 	if err == sql.ErrNoRows {
 		return nil, sql.ErrNoRows
 	} else if err != nil {
 		return nil, err
+	}
+	if inHtml {
+		mg.Content = mdToHtml(mg.Content)
 	}
 
 	return mg, nil
@@ -49,6 +57,7 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 		if err != nil {
 			return nil, err
 		}
+		mg.Content = mdToHtml(mg.Content)
 		guides = append(guides, mg)
 	}
 	if err = rows.Err(); err != nil {
@@ -65,12 +74,58 @@ func (g *GuidesModel) Insert(title, content, author string) (int, error) {
 	RETURNING id`
 
 	var id int
+	now := time.Now()
 	// res, err := g.DB.Exec(stmt, title, content, author, time.Now(), time.Now())
-	err := g.DB.QueryRow(stmt, title, content, author, time.Now(), time.Now()).Scan(&id)
+	err := g.DB.QueryRow(stmt, title, content, author, now, now).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
 
 	fmt.Println(id)
 	return id, nil
+}
+
+func (g *GuidesModel) DeleteById(id int) error {
+
+	stmt := `DELETE FROM guides WHERE id = $1`
+
+	_, err := g.DB.Exec(stmt, id)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func (g *GuidesModel) UpdateById(title, content string, id int) error {
+
+	stmt := `UPDATE guides 
+	SET title = $1,
+	content = $2,
+	updated = $3
+	WHERE id = $4`
+
+	_, err := g.DB.Exec(stmt, title, content, time.Now(), id)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// mdToHtml converts raw MD (as saved in DB) to HTML
+func mdToHtml(convert template.HTML) template.HTML {
+
+	// specify goldmark extension
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.TaskList),
+		goldmark.WithExtensions(extension.Footnote),
+	)
+
+	var buf bytes.Buffer
+	source := []byte(convert)
+	if err := md.Convert(source, &buf); err != nil {
+		panic(err)
+	}
+	return template.HTML(buf.Bytes())
 }

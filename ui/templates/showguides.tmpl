@@ -8,7 +8,37 @@
     {{.Content}} <br>
     <p></p>
     By: {{.Author}} <br>
-    Created: {{humandate .Created}}
+    Created: {{humandate .Created}} <br>
+    {{if ne .Created .Updated}}
+    Updated: {{humandate .Updated}} <br>
+    {{end}}
+    <form action="/showguides" method="post"> 
+        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete"> 
+        <input type="submit" name="edit" value="Edit">
+        <input type="hidden" name="id" value="{{.Id}}">
+    </form>    
+
+    {{/* <form action="/editguide" method="post"> 
+        <input type="submit" value="Edit">
+        <input type="hidden" name="id" value="{{.Id}}">
+    </form> */}}
+
+
     <p>________________________</p>
+    {{end}}
 {{end}}
+<!-- Edit this JS function - works but have to reload to see deleletion took place -->
+{{define "js"}} 
+    <script>
+        let deltrue;
+        function confirmDeletion(){
+            if (confirm("Are you sure to delete?") == true) {
+                deltrue = true;
+                return deltrue;
+            } else {
+                deltrue = false;
+                return deltrue;
+            }          
+        }
+    </script>
 {{end}}

@@ -2,18 +2,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    {{/* <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> */}}
+    <meta name="lightning" content="lnurlp:And1@stacker.news"/>
+    <meta property="og:image" content="https://www.4sonline.org/wp-content/uploads/2020/09/culture3.png" />
+
+    <link rel="stylesheet" href="/ui/static/css/main.css">
+
     <title>{{template "title" .}}</title>
 </head>
 <body>
     <nav>
         <a href="http://localhost:8080/home">₿ Home</a>
         <a href="http://localhost:8080/showguides">Guides</a>
-        <a href="http://localhost:8080/createguides">Create</a>
+        <a href="http://localhost:8080/createguide">Create</a>
     </nav>
-{{template "body" .}}    
+{{template "body" .}}   
+{{block "js" .}}
+
+{{end}}
 </body>
 </html>
 {{end}}

@@ -1,0 +1,12 @@
+body {
+    color: #ffffff;
+    background-color: mediumseagreen;
+    margin: 3vmin 5vmax 0vmin 5vmax; /*top,right,bottom,left*/
+
+}
+
+@media (min-width: 30em) {
+    body {
+        background-color: rgb(104, 104, 204);
+    }
+}

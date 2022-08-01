@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
@@ -38,7 +40,7 @@ func HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 
-		gg, err := dbg.GetById(id)
+		gg, err := dbg.GetById(id, true)
 		if err != nil {
 			log.Println(err)
 		}
@@ -54,37 +56,29 @@ func CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
 	render(w, "./ui/templates/createguide.tmpl", td)
 }
 
-// With goldmark - md lang to easily convert md to html
-/*
 func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
-	// specify goldmark extension
-	md := goldmark.New(
-		goldmark.WithExtensions(extension.TaskList),
-		goldmark.WithExtensions(extension.Footnote),
-	)
-
-	var buf bytes.Buffer
-	source := []byte(r.FormValue("content"))
-	if err := md.Convert(source, &buf); err != nil {
-		panic(err)
+	// dont't know if this is good design / used to be able to use 1html form for delete and edit. One form means 1action see html
+	if r.FormValue("edit") == "Edit" {
+		EditGuidesHandler(w, r)
+		return
 	}
-
-	if r.FormValue("title") != "" && r.FormValue("content") != "" {
-		td.Guides = append(td.Guides, &models.Guide{
-			Title:   r.FormValue("title"),
-			Content: template.HTML(buf.String()),
-			Author:  "Anon",
-		})
-
-	}
-	render(w, "./ui/templates/showguides.tmpl", td)
-}
-*/
-
-func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
 	dbg := postgres.GuidesModel{DB: DB}
+
+	if r.FormValue("delete") == "Delete" {
+		id, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		err = dbg.DeleteById(id)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(r.FormValue("id"))
+	}
 
 	ga, err := dbg.GetAll()
 	if err != nil {
@@ -93,6 +87,39 @@ func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 	td.Guides = ga
 
 	render(w, "./ui/templates/showguides.tmpl", td)
+}
+
+// EditGuidesHandler handles 2 kind of request
+// 1. Shows Title and content by ID to edit in HTML Forms
+// 2. If edit gots submitted it gets updated in DB and shown as 1.
+func EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
+
+	dbg := postgres.GuidesModel{DB: DB}
+
+	id, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if r.FormValue("submitEdit") == "Save" {
+		err := dbg.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
+	gid, err := dbg.GetById(id, false)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	td.Guide = gid
+	fmt.Println(gid)
+
+	render(w, "./ui/templates/editguide.tmpl", td)
 }
 
 func render(w http.ResponseWriter, filename string, td TemplateData) {

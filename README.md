@@ -16,6 +16,11 @@
 #### 2. Create User
 - connect to DB for authenication?
 
+### Current ToDo List:
+- [ ] Go trough handler and add html.StatusCodes for Error returns
+- [ ] Build Basic CSS 
+- [ ] Build TestCases
+
 
 ### More on lnurl-auth
 - [fiatjaf blog:](https://fiatjaf.com/e0a35204.html)
