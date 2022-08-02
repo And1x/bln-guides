@@ -2,43 +2,46 @@
 {{define "title"}}View Guides{{end}}
 {{define "body"}}
 
-    <h1>Guides:</h1>
+<h1>Guides:</h1>
+
 {{range .Guides}}
-    <h2>Title: {{.Title}}</h2>
+<div class="fullguide">
+    <form class="fullguide-buttons" action="/showguides" method="post">
+        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
+        <input type="submit" name="edit" value="Edit">
+        <input type="hidden" name="id" value="{{.Id}}">
+    </form>
+    <h2 class="title">Title: {{.Title}}</h2>
     {{.Content}} <br>
-    <p></p>
+
+<div class="guide-footer">
     By: {{.Author}} <br>
     Created: {{humandate .Created}} <br>
     {{if ne .Created .Updated}}
     Updated: {{humandate .Updated}} <br>
     {{end}}
-    <form action="/showguides" method="post"> 
-        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete"> 
-        <input type="submit" name="edit" value="Edit">
-        <input type="hidden" name="id" value="{{.Id}}">
-    </form>    
+</div>
 
-    {{/* <form action="/editguide" method="post"> 
+    {{/* <form action="/editguide" method="post">
         <input type="submit" value="Edit">
         <input type="hidden" name="id" value="{{.Id}}">
     </form> */}}
+</div>
 
-
-    <p>________________________</p>
-    {{end}}
+{{end}}
 {{end}}
 <!-- Edit this JS function - works but have to reload to see deleletion took place -->
-{{define "js"}} 
-    <script>
-        let deltrue;
-        function confirmDeletion(){
-            if (confirm("Are you sure to delete?") == true) {
-                deltrue = true;
-                return deltrue;
-            } else {
-                deltrue = false;
-                return deltrue;
-            }          
+{{define "js"}}
+<script>
+    let deltrue;
+    function confirmDeletion() {
+        if (confirm("Are you sure to delete?") == true) {
+            deltrue = true;
+            return deltrue;
+        } else {
+            deltrue = false;
+            return deltrue;
         }
-    </script>
+    }
+</script>
 {{end}}

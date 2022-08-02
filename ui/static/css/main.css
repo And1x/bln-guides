@@ -1,12 +1,44 @@
+:root {
+    --main-frame-color: rgb(218, 190, 32);
+}
+
 body {
     color: #ffffff;
-    background-color: mediumseagreen;
+    background-color: rgb(33, 51, 42);
     margin: 3vmin 5vmax 0vmin 5vmax; /*top,right,bottom,left*/
 
 }
 
-@media (min-width: 30em) {
-    body {
-        background-color: rgb(104, 104, 204);
-    }
+.navbar {
+    font-size: 1.5em;
+    border-bottom: 3px solid var(--main-frame-color);
+}
+
+.fullguide {
+    border: 1px double var(--main-frame-color);
+    border-radius: 3em;
+    padding: 1em 0.5em;
+    margin-bottom: 0.5em;
+}
+.fullguide-buttons {
+    float: right;
+    margin-right: 0.5em;
+}
+.guide-footer {
+    border: 0.1em dotted var(--main-frame-color);
+    border-radius: 8em;
+    text-align: center;
+}
+.title {
+   color: rgb(199, 240, 216);
+   text-decoration-line: underline;
+}
+
+ul {
+    background-color: rgba(128, 128, 128, 0.384);
+    border-radius: 25px;
+}
+
+a {
+color: black;
 }

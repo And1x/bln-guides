@@ -13,11 +13,14 @@
     <title>{{template "title" .}}</title>
 </head>
 <body>
+<div class="navbar">
     <nav>
         <a href="http://localhost:8080/home">₿ Home</a>
         <a href="http://localhost:8080/showguides">Guides</a>
         <a href="http://localhost:8080/createguide">Create</a>
     </nav>
+</div>
+
 {{template "body" .}}   
 {{block "js" .}}
 
