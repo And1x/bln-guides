@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// instead of const use env vars or cli args
 const (
 	host     = "localhost"
 	port     = 5432
@@ -39,7 +40,8 @@ func main() {
 	mux.HandleFunc("/editguide", EditGuidesHandler)
 
 	fs := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/ui/static/", http.StripPrefix("/ui/static/", fs))
+	//mux.Handle("/ui/static/", http.StripPrefix("/ui/static/", fs))
+	mux.Handle("/static/", http.StripPrefix("/static", fs))
 
 	log.Println("Starting Server on Port :8080")
 	err = http.ListenAndServe(":8080", mux)

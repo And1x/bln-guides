@@ -31,6 +31,11 @@ var td TemplateData
 
 func HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
+	if r.URL.Path != "/" && r.URL.Path != "/home" {
+		http.NotFound(w, r)
+		return
+	}
+
 	if r.FormValue("title") != "" {
 
 		dbg := &postgres.GuidesModel{DB: DB} // dbg = database guides

@@ -1,11 +1,12 @@
 :root {
-    --main-frame-color: rgb(218, 190, 32);
+    --main-frame-color: rgb(224, 202, 75);
 }
 
 body {
     color: #ffffff;
-    background-color: rgb(33, 51, 42);
+    background-color: rgb(51, 61, 56);
     margin: 3vmin 5vmax 0vmin 5vmax; /*top,right,bottom,left*/
+    font-family: Helvetica, Arial, sans-serif;
 
 }
 
@@ -22,6 +23,7 @@ body {
 }
 .fullguide-buttons {
     float: right;
+    padding: 1.5em 0.5em;
     margin-right: 0.5em;
 }
 .guide-footer {
@@ -40,5 +42,5 @@ ul {
 }
 
 a {
-color: black;
+color: rgb(211, 240, 195);
 }

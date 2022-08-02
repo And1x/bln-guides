@@ -20,6 +20,7 @@
 - [ ] Go trough handler and add html.StatusCodes for Error returns
 - [ ] Build Basic CSS 
 - [ ] Build TestCases
+- [ ] Day/Night mode
 
 
 ### More on lnurl-auth
