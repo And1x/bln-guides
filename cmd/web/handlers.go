@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
-	"github.com/and1x/bln--h/pkg/models/postgres"
 )
 
 type TemplateData struct {
@@ -29,7 +28,7 @@ var functions = template.FuncMap{
 
 var td TemplateData
 
-func HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" && r.URL.Path != "/home" {
 		http.NotFound(w, r)
@@ -38,68 +37,64 @@ func HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.FormValue("title") != "" {
 
-		dbg := &postgres.GuidesModel{DB: DB} // dbg = database guides
-
-		id, err := dbg.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
+		id, err := app.guides.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err) // todo: err handling
 		}
 
-		gg, err := dbg.GetById(id, true)
+		gg, err := app.guides.GetById(id, true)
 		if err != nil {
-			log.Println(err)
+			log.Println(err) // todo: err handling
 		}
 		td.Guide = gg
 	} else { // show default home page
 		td.Guide = &models.Guide{}
 	}
-	render(w, "./ui/templates/home.tmpl", td)
+	app.render(w, "./ui/templates/home.tmpl", td)
 }
 
-func CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
 	td := TemplateData{}
-	render(w, "./ui/templates/createguide.tmpl", td)
+	app.render(w, "./ui/templates/createguide.tmpl", td)
 }
 
-func ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// dont't know if this is good design / used to be able to use 1html form for delete and edit. One form means 1action see html
 	if r.FormValue("edit") == "Edit" {
-		EditGuidesHandler(w, r)
+		app.EditGuidesHandler(w, r)
 		return
 	}
-
-	dbg := postgres.GuidesModel{DB: DB}
 
 	if r.FormValue("delete") == "Delete" {
 		id, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err) // todo: err handling
 			return
 		}
-		err = dbg.DeleteById(id)
+		err = app.guides.DeleteById(id)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err) // todo: err handling
 			return
 		}
 		fmt.Println(r.FormValue("id"))
 	}
 
-	ga, err := dbg.GetAll()
+	ga, err := app.guides.GetAll()
 	if err != nil {
-		log.Println(err) // handle this err better not just printing out
+		http.Error(w, "couldn't get DB result", http.StatusInternalServerError)
+		log.Println(err)
+		return
 	}
 	td.Guides = ga
 
-	render(w, "./ui/templates/showguides.tmpl", td)
+	app.render(w, "./ui/templates/showguides.tmpl", td)
 }
 
 // EditGuidesHandler handles 2 kind of request
 // 1. Shows Title and content by ID to edit in HTML Forms
 // 2. If edit gots submitted it gets updated in DB and shown as 1.
-func EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
-
-	dbg := postgres.GuidesModel{DB: DB}
+func (app *app) EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
@@ -108,26 +103,26 @@ func EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.FormValue("submitEdit") == "Save" {
-		err := dbg.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
+		err := app.guides.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
 		if err != nil {
-			log.Println(err)
+			log.Println(err) // todo: err handling
 			return
 		}
 	}
 
-	gid, err := dbg.GetById(id, false)
+	gid, err := app.guides.GetById(id, false)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	td.Guide = gid
-	fmt.Println(gid)
+	fmt.Println(gid) // dont forget to delete
 
-	render(w, "./ui/templates/editguide.tmpl", td)
+	app.render(w, "./ui/templates/editguide.tmpl", td)
 }
 
-func render(w http.ResponseWriter, filename string, td TemplateData) {
+func (app *app) render(w http.ResponseWriter, filename string, td TemplateData) {
 
 	tp, err := template.New("base").Funcs(functions).ParseFiles(filename, "./ui/templates/base.layout.tmpl")
 	if err != nil {
@@ -135,6 +130,7 @@ func render(w http.ResponseWriter, filename string, td TemplateData) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
 	err = tp.Execute(w, td)
 	if err != nil {
 		log.Println(err.Error())

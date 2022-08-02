@@ -113,6 +113,7 @@ func (g *GuidesModel) UpdateById(title, content string, id int) error {
 	return nil
 }
 
+// todo: maybe put in another file?
 // mdToHtml converts raw MD (as saved in DB) to HTML
 func mdToHtml(convert template.HTML) template.HTML {
 

@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln--h/pkg/models/postgres"
 	_ "github.com/lib/pq"
 )
 
@@ -18,29 +20,38 @@ const (
 	dbname   = "blnguide"
 )
 
-var DB *sql.DB // maybe just db enough hence it's only package level??
+type app struct {
+	guides interface { // GuidesModel in guides.go satisfies interface guides hence it implements all methods
+		GetById(id int, inHtml bool) (*models.Guide, error)
+		GetAll() ([]*models.Guide, error)
+		Insert(title, content, author string) (int, error)
+		DeleteById(id int) error
+		UpdateById(title, content string, id int) error
+	}
+}
 
 func main() {
 
 	connectPsql := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	var err error
-	DB, err = openDB(connectPsql)
+	db, err := openDB(connectPsql)
 	if err != nil {
-		//panic(err)
 		log.Panic(err)
 	}
-	defer DB.Close()
+	defer db.Close()
+
+	a := app{
+		guides: &postgres.GuidesModel{DB: db},
+	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", HomeSiteHandler)
-	mux.HandleFunc("/showguides", ShowGuidesHandler)
-	mux.HandleFunc("/createguide", CreateGuideHandler)
-	mux.HandleFunc("/editguide", EditGuidesHandler)
+	mux.HandleFunc("/", a.HomeSiteHandler)
+	mux.HandleFunc("/showguides", a.ShowGuidesHandler)
+	mux.HandleFunc("/createguide", a.CreateGuideHandler)
+	mux.HandleFunc("/editguide", a.EditGuidesHandler)
 
 	fs := http.FileServer(http.Dir("./ui/static/"))
-	//mux.Handle("/ui/static/", http.StripPrefix("/ui/static/", fs))
 	mux.Handle("/static/", http.StripPrefix("/static", fs))
 
 	log.Println("Starting Server on Port :8080")
