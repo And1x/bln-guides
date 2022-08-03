@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+	log.Println("Connected to PostgreSQL")
 	defer db.Close()
 
 	a := app{

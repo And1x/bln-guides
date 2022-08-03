@@ -18,9 +18,9 @@
 
 ### Current ToDo List:
 - [ ] Go trough handler and add html.StatusCodes for Error returns
-- [ ] Build Basic CSS 
+- [x] Build Basic CSS 
 - [ ] Build TestCases
-- [ ] Day/Night mode
+- [x] Day/Night mode
 
 
 ### More on lnurl-auth

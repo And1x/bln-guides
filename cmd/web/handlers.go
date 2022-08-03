@@ -39,12 +39,15 @@ func (app *app) HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 		id, err := app.guides.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
 		if err != nil {
-			log.Fatal(err) // todo: err handling
+			http.Error(w, "Couldnt Insert into DB", http.StatusInternalServerError) // todo: Dont expose intera - refactor msg
+			log.Println(err)
+			return // todo: revisit bc. it may be better wo. return to load home content - better ux
 		}
 
 		gg, err := app.guides.GetById(id, true)
 		if err != nil {
-			log.Println(err) // todo: err handling
+			http.Error(w, "Cant get Guide by ID", http.StatusInternalServerError) // todo: Dont expose interna - refactor msg
+			log.Println(err)                                                      // todo: err handling
 		}
 		td.Guide = gg
 	} else { // show default home page
@@ -105,6 +108,7 @@ func (app *app) EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.FormValue("submitEdit") == "Save" {
 		err := app.guides.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
 		if err != nil {
+			http.Error(w, "couldn't update DB query", http.StatusInternalServerError)
 			log.Println(err) // todo: err handling
 			return
 		}
@@ -126,14 +130,14 @@ func (app *app) render(w http.ResponseWriter, filename string, td TemplateData) 
 
 	tp, err := template.New("base").Funcs(functions).ParseFiles(filename, "./ui/templates/base.layout.tmpl")
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	err = tp.Execute(w, td)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
 		http.Error(w, "Internal Server Error while Executing tmpl", http.StatusInternalServerError)
 	}
 }

@@ -1,4 +1,4 @@
-:root {
+ :root {
     --main-frame-color: rgb(224, 202, 75);
 }
 
@@ -7,7 +7,6 @@ body {
     background-color: rgb(51, 61, 56);
     margin: 3vmin 5vmax 0vmin 5vmax; /*top,right,bottom,left*/
     font-family: Helvetica, Arial, sans-serif;
-
 }
 
 .navbar {
@@ -43,4 +42,4 @@ ul {
 
 a {
 color: rgb(211, 240, 195);
-}
+} 

@@ -1,2 +1,3 @@
 # Ignore postgresql and application specific notes
 notes.md
+ui/static/css/sys-dark-light.css
