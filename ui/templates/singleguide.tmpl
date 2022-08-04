@@ -1,0 +1,18 @@
+{{template "base" .}}
+
+{{define "title"}}View Guide{{end}}
+{{define "body"}}
+
+{{with .Guide}}
+    <h2 class="title">Title: {{.Title}}</h2>
+    {{.Content}} <br>
+
+<div class="guide-footer">
+    By: {{.Author}} <br>
+    Created: {{humandate .Created}} <br>
+    {{if ne .Created .Updated}}
+        Updated: {{humandate .Updated}} <br>
+    {{end}}
+</div>
+{{end}}
+{{end}}
