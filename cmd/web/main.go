@@ -42,22 +42,17 @@ func main() {
 	log.Println("Connected to PostgreSQL")
 	defer db.Close()
 
-	a := app{
+	app := &app{
 		guides: &postgres.GuidesModel{DB: db},
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", a.homeSiteHandler)
-	mux.HandleFunc("/allguides", a.allGuidesHandler)
-	mux.HandleFunc("/createguide", a.createGuideHandler)
-	mux.HandleFunc("/editguide", a.editGuidesHandler)
-	mux.HandleFunc("/guide", a.singleGuideHandler)
-
-	fs := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fs))
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: app.routes(),
+	}
 
 	log.Println("Starting Server on Port :8080")
-	err = http.ListenAndServe(":8080", mux)
+	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
 
