@@ -81,7 +81,7 @@ func (g *GuidesModel) Insert(title, content, author string) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(id)
+	fmt.Println(id) // todo: delete inproduction
 	return id, nil
 }
 

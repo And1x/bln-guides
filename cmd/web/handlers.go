@@ -6,15 +6,16 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
 )
 
 type TemplateData struct {
-	Guide  *models.Guide
-	Guides []*models.Guide
-	Text   []string
+	Guide   *models.Guide
+	Guides  []*models.Guide
+	InfoMsg map[string]string
 }
 
 func humandate(t time.Time) string {
@@ -35,7 +36,13 @@ func (app *app) HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.FormValue("title") != "" {
+	//if r.FormValue("title") != "" {
+	if r.Method == http.MethodPost { // todo: seems better than check if title is set
+
+		if strings.TrimSpace(r.FormValue("title")) == "" || strings.TrimSpace(r.FormValue("content")) == "" { // todo: handle empty title ant content form directly in the handler?
+			app.CreateGuideHandler(w, r)
+			return
+		}
 
 		id, err := app.guides.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
 		if err != nil {
@@ -58,6 +65,11 @@ func (app *app) HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
 	td := TemplateData{}
+	if r.Method == http.MethodPost { //todo: refactor/ check if we failed with empty form form - see homesitehandler
+		td.InfoMsg = map[string]string{}
+		td.InfoMsg["emptyFields"] = "Please enter title and content"
+	}
+
 	app.render(w, "./ui/templates/createguide.tmpl", td)
 }
 

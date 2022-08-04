@@ -10,3 +10,12 @@
         <input type="submit" value="Post">
     </form>
 {{end}}
+
+{{define "js"}}
+{{if .InfoMsg.emptyFields  }}
+<script>
+alert({{.InfoMsg.emptyFields}});
+</script>
+{{end}}
+{{end}}
+
