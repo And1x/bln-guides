@@ -22,6 +22,15 @@
 - [ ] Build TestCases
 - [x] Day/Night mode
 
+ # Routes:
+| method | route          | handler                |
+|--------|----------------|------------------------|
+| get    | / "or" /home   | homeSiteHandler        |
+| get    | /createguide   | createGuideFormHandler |
+| post   | /createguide   | createGuideHandler     |
+| post   | /editguide     | editGuideHandler       |
+| get    | /allguides     | allGuidesHandler       |
+| get??? | /guide/id="%d" | singleGuideHandler     |
 
 ### More on lnurl-auth
 - [fiatjaf blog:](https://fiatjaf.com/e0a35204.html)

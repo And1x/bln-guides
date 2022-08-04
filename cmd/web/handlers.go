@@ -29,42 +29,20 @@ var functions = template.FuncMap{
 
 var td TemplateData
 
-func (app *app) HomeSiteHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" && r.URL.Path != "/home" {
 		http.NotFound(w, r)
 		return
 	}
 
-	//if r.FormValue("title") != "" {
-	if r.Method == http.MethodPost { // todo: seems better than check if title is set
-
-		if strings.TrimSpace(r.FormValue("title")) == "" || strings.TrimSpace(r.FormValue("content")) == "" { // todo: handle empty title ant content form directly in the handler?
-			app.CreateGuideHandler(w, r)
-			return
-		}
-
-		id, err := app.guides.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
-		if err != nil {
-			http.Error(w, "Couldnt Insert into DB", http.StatusInternalServerError) // todo: Dont expose intera - refactor msg
-			log.Println(err)
-			return // todo: revisit bc. it may be better wo. return to load home content - better ux
-		}
-
-		gg, err := app.guides.GetById(id, true)
-		if err != nil {
-			http.Error(w, "Cant get Guide by ID", http.StatusInternalServerError) // todo: Dont expose interna - refactor msg
-			log.Println(err)                                                      // todo: err handling
-		}
-		td.Guide = gg
-	} else { // show default home page
-		td.Guide = &models.Guide{}
-	}
 	app.render(w, "./ui/templates/home.tmpl", td)
 }
 
-func (app *app) CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
+// createGuideFormHandler gets called via "get" to show createguide Form
+func (app *app) createGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 	td := TemplateData{}
+	// todo: refactor this.
 	if r.Method == http.MethodPost { //todo: refactor/ check if we failed with empty form form - see homesitehandler
 		td.InfoMsg = map[string]string{}
 		td.InfoMsg["emptyFields"] = "Please enter title and content"
@@ -73,11 +51,78 @@ func (app *app) CreateGuideHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, "./ui/templates/createguide.tmpl", td)
 }
 
-func (app *app) ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == http.MethodPost {
+
+		// return to create Guide Form in case no title and content
+		if strings.TrimSpace(r.FormValue("title")) == "" || strings.TrimSpace(r.FormValue("content")) == "" { // todo: handle empty title ant content form directly in the handler?
+			app.render(w, "./ui/templates/createguide.tmpl", TemplateData{})
+			return
+		}
+
+		id, err := app.guides.Insert(r.FormValue("title"), r.FormValue("content"), "anon")
+		if err != nil {
+			http.Error(w, "Couldnt Insert into DB", http.StatusInternalServerError) // todo: Dont expose intera - refactor msg
+			log.Println(err)
+			return // todo: revisit bc. it may be better wo. return to load content - better ux
+		}
+
+		gg, err := app.guides.GetById(id, true)
+		if err != nil {
+			http.Error(w, "Cant get Guide by ID", http.StatusInternalServerError) // todo: Dont expose interna - refactor msg
+			log.Println(err)                                                      // todo: err handling
+		}
+		td.Guide = gg
+
+		http.Redirect(w, r, fmt.Sprintf("/guide?id=%d", id), http.StatusSeeOther)
+
+	} else if r.Method == http.MethodGet { // todo: maybe better handled in routes.go
+		app.createGuideFormHandler(w, r)
+	} else {
+		http.Error(w, "wrong http method", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+// EditGuidesHandler handles 2 kind of request
+// 1. Shows Title and content by ID to edit in HTML Forms
+// 2. If edit gots submitted - editGuidesHandler gets called again to save in DB and redirects to singleguide.tmpl
+func (app *app) editGuidesHandler(w http.ResponseWriter, r *http.Request) {
+
+	id, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if r.FormValue("submitEdit") == "Save" {
+		err := app.guides.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
+		if err != nil {
+			http.Error(w, "couldn't update DB query", http.StatusInternalServerError)
+			log.Println(err) // todo: err handling
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/guide?id=%d", id), http.StatusSeeOther)
+	}
+
+	gid, err := app.guides.GetById(id, false) // false bc edit in md not html
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	td.Guide = gid
+	fmt.Println(gid) // dont forget to delete
+
+	app.render(w, "./ui/templates/editguide.tmpl", td)
+}
+
+func (app *app) allGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
 	// dont't know if this is good design / used to be able to use 1html form for delete and edit. One form means 1action see html
 	if r.FormValue("edit") == "Edit" {
-		app.EditGuidesHandler(w, r)
+		app.editGuidesHandler(w, r)
 		return
 	}
 
@@ -103,39 +148,27 @@ func (app *app) ShowGuidesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	td.Guides = ga
 
-	app.render(w, "./ui/templates/showguides.tmpl", td)
+	app.render(w, "./ui/templates/allguides.tmpl", td)
 }
 
-// EditGuidesHandler handles 2 kind of request
-// 1. Shows Title and content by ID to edit in HTML Forms
-// 2. If edit gots submitted it gets updated in DB and shown as 1.
-func (app *app) EditGuidesHandler(w http.ResponseWriter, r *http.Request) {
+// singleGuideHandler handles via URL requested guide - in form like: .../guide?id=123
+func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.FormValue("id"))
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
+		log.Print(err) // todo: errhandler
+		return
+	}
+	guide, err := app.guides.GetById(id, true)
+	if err != nil {
+		http.Error(w, "couldnt get guide from db", http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
+	td.Guide = guide
 
-	if r.FormValue("submitEdit") == "Save" {
-		err := app.guides.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
-		if err != nil {
-			http.Error(w, "couldn't update DB query", http.StatusInternalServerError)
-			log.Println(err) // todo: err handling
-			return
-		}
-	}
+	app.render(w, "./ui/templates/singleguide.tmpl", td)
 
-	gid, err := app.guides.GetById(id, false)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	td.Guide = gid
-	fmt.Println(gid) // dont forget to delete
-
-	app.render(w, "./ui/templates/editguide.tmpl", td)
 }
 
 func (app *app) render(w http.ResponseWriter, filename string, td TemplateData) {

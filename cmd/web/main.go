@@ -47,10 +47,11 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", a.HomeSiteHandler)
-	mux.HandleFunc("/showguides", a.ShowGuidesHandler)
-	mux.HandleFunc("/createguide", a.CreateGuideHandler)
-	mux.HandleFunc("/editguide", a.EditGuidesHandler)
+	mux.HandleFunc("/", a.homeSiteHandler)
+	mux.HandleFunc("/allguides", a.allGuidesHandler)
+	mux.HandleFunc("/createguide", a.createGuideHandler)
+	mux.HandleFunc("/editguide", a.editGuidesHandler)
+	mux.HandleFunc("/guide", a.singleGuideHandler)
 
 	fs := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle("/static/", http.StripPrefix("/static", fs))
