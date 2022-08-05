@@ -9,7 +9,7 @@ import (
 // serverError logs a stack trace + error msg and sends a http Status Error to the User
 func (app *app) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n,%s", err.Error(), debug.Stack())
-	app.errorLog.Println(trace)
+	app.errorLog.Output(2, trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
