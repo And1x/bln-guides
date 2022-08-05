@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/and1x/bln--h/pkg/models"
 	"github.com/and1x/bln--h/pkg/models/postgres"
@@ -21,7 +22,9 @@ const (
 )
 
 type app struct {
-	guides interface { // GuidesModel in guides.go satisfies interface guides hence it implements all methods
+	infoLog  *log.Logger
+	errorLog *log.Logger
+	guides   interface { // GuidesModel in guides.go satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetAll() ([]*models.Guide, error)
 		Insert(title, content, author string) (int, error)
@@ -31,29 +34,38 @@ type app struct {
 }
 
 func main() {
+	// leveled logging - todo: if needed add warningLog
+	infoLog := log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile)
 
+	// DB Postgresql
 	connectPsql := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
 	db, err := openDB(connectPsql)
 	if err != nil {
-		log.Panic(err)
+		errorLog.Panic(err)
 	}
-	log.Println("Connected to PostgreSQL")
+	infoLog.Println("Connected to PostgreSQL")
 	defer db.Close()
 
+	//  App
 	app := &app{
-		guides: &postgres.GuidesModel{DB: db},
+		infoLog:  infoLog,
+		errorLog: errorLog,
+		guides:   &postgres.GuidesModel{DB: db},
 	}
 
+	// HTTP-Server
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: app.routes(),
+		Addr:     ":8080",
+		Handler:  app.routes(),
+		ErrorLog: errorLog,
 	}
 
-	log.Println("Starting Server on Port :8080")
+	infoLog.Println("Starting Server on Port :8080")
 	err = srv.ListenAndServe()
-	log.Fatal(err)
+	errorLog.Fatal(err)
 }
 
 func openDB(settings string) (*sql.DB, error) {

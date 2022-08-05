@@ -3,7 +3,6 @@ package postgres
 import (
 	"bytes"
 	"database/sql"
-	"fmt"
 	"html/template"
 	"log"
 	"time"
@@ -81,7 +80,6 @@ func (g *GuidesModel) Insert(title, content, author string) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(id) // todo: delete inproduction
 	return id, nil
 }
 
