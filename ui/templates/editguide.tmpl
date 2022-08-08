@@ -1,11 +1,21 @@
 {{template "base" .}}
 {{define "title"}}Edit Guide{{end}}
 {{define "body"}}
-<br>
     <form method="POST" action="/editguide">
         <label for="title">Title:</label><br>
+        {{with .Form}}
+            {{with .Errors.Get "title"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+        {{end}}
         <input type="text" name="title" id="guideTitle" value="{{.Guide.Title}}"><br><br>
+
         <label for="content">Content:</label><br>
+        {{with .Form}}
+            {{with .Errors.Get "content"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+        {{end}}
         <textarea name="content" id="" cols="80" rows="10">{{.Guide.Content}}</textarea><br>
         <input type="hidden" name="id" value="{{.Guide.Id}}">
         <input type="submit" name="submitEdit" value="Save">

@@ -1,21 +1,29 @@
 {{template "base" .}}
 {{define "title"}}Create a new Guide{{end}}
 {{define "body"}}
-<br>
-    <form method="POST" action="/createguide">
-        <label for="title">Title:</label><br>
-        <input type="text" name="title" id="guideTitle"><br><br>
-        <label for="content">Content:</label><br>
-        <textarea name="content" id="" cols="96" rows="21"></textarea><br>
-        <input type="submit" value="Post">
-    </form>
+
+<form method="POST" action="/createguide">
+    {{with .Form}}
+        <div>
+            <label for="title">Title:</label><br>
+            {{with .Errors.Get "title"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+            <input type="text" name="title" id="guideTitle" value='{{.Get "title"}}'><br>
+        </div>
+        <div>
+            <label for="content">Content:</label><br>
+            {{with .Errors.Get "content"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+            <textarea name="content" id="" cols="96" rows="21">{{.Get "content"}}</textarea><br>
+        </div>
+        <div>
+            <input type="submit" value="Post">
+        </div>
+    {{end}}
+</form>
 {{end}}
 
-{{define "js"}}
-{{if .InfoMsg.emptyFields  }}
-<script>
-alert({{.InfoMsg.emptyFields}});
-</script>
-{{end}}
-{{end}}
+
 
