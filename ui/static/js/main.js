@@ -1,17 +1,15 @@
-function jsToggleDayNight() {
-    if (localStorage == null) {
-        localStorage.setItem('darkmode', 'true');
-    }
 
-    const theme = document.getElementById('cssstyle');
 
-    if (localStorage.getItem('darkmode') == 'true' ){
-        theme.setAttribute('href', '/static/css/day.css');
-        localStorage.SetItem('darkmode', 'false');
-        console.log("was here");
+
+
+let deltrue;
+function confirmDeletion() {
+    if (confirm("Are you sure to delete?") == true) {
+        deltrue = true;
+        return deltrue;
     } else {
-        theme.setAttribute('href', '/static/css/main.css');
-        localStorage.SetItem('darkmode', 'true');
-        console.log("heree>?");
+        deltrue = false;
+        return deltrue;
     }
- }
+}
+

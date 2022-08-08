@@ -17,20 +17,26 @@
 - connect to DB for authenication?
 
 ### Current ToDo List:
-- [ ] Go trough handler and add html.StatusCodes for Error returns
+- [x] Go trough handler and add html.StatusCodes for Error returns
 - [x] Build Basic CSS 
 - [ ] Build TestCases
 - [x] Day/Night mode
+### Possible Todo:
+- [ ] Use own middleware Chains insead of justinas/alice same - seems not that difficult to implement
+- [ ] 
 
  # Routes:
-| method | route          | handler                |
-|--------|----------------|------------------------|
-| get    | / "or" /home   | homeSiteHandler        |
-| get    | /createguide   | createGuideFormHandler |
-| post   | /createguide   | createGuideHandler     |
-| post   | /editguide     | editGuideHandler       |
-| get    | /allguides     | allGuidesHandler       |
-| get??? | /guide/id="%d" | singleGuideHandler     |
+
+| method | route          | handler                | description                                       |
+|--------|----------------|------------------------|---------------------------------------------------|
+| get    | /              | homeSiteHandler        | default home page                                 |
+| get    | /createguide   | createGuideFormHandler | empty Form to create guides                       |
+| post   | /createguide   | createGuideHandler     | insert new guide in DB → redirect to guide/id     |
+| get    | /editguide/id  | editGuideFormHandler   | Form with values from guide by ID                 |
+| post   | /editguide     | editGuideHandler       | Updated edited guide in DB → redirect to guide/id |
+| get    | /allguides     | allGuideHandler        | lists all guides                                  |
+| post   | /deleteguide   | deleteGuideHandler     | deletes Guide by ID                               |
+| get    | /guide/id      | singleGuideHandler     | shows specific guide by ID                        |
 
 ### More on lnurl-auth
 - [fiatjaf blog:](https://fiatjaf.com/e0a35204.html)

@@ -4,6 +4,14 @@
 {{define "body"}}
 
 {{with .Guide}}
+<div class="fullguide-buttons">
+    <form action="/deleteguide" method="post">
+        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
+        <input type="hidden" name="id" value="{{.Id}}">
+    </form>
+    <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
+</div>
+
     <h2 class="title">Title: {{.Title}}</h2>
     {{.Content}} <br>
 
@@ -16,3 +24,4 @@
 </div>
 {{end}}
 {{end}}
+

@@ -1,18 +1,28 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
 
-func (app *app) routes() *http.ServeMux {
+	"github.com/bmizerany/pat"
+	"github.com/justinas/alice"
+)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.homeSiteHandler)
-	mux.HandleFunc("/allguides", app.allGuidesHandler)
-	mux.HandleFunc("/createguide", app.createGuideHandler)
-	mux.HandleFunc("/editguide", app.editGuidesHandler)
-	mux.HandleFunc("/guide", app.singleGuideHandler)
+func (app *app) routes() http.Handler {
+
+	defaultMiddleware := alice.New(app.recoverPanic, app.logging)
+
+	mux := pat.New()
+	mux.Get("/", http.HandlerFunc(app.homeSiteHandler))
+	mux.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))
+	mux.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))
+	mux.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
+	mux.Post("/createguide", http.HandlerFunc(app.createGuideHandler))
+	mux.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
+	mux.Get("/editguide/:id", http.HandlerFunc(app.editGuideFormHandler))
+	mux.Get("/guide/:id", http.HandlerFunc(app.singleGuideHandler))
 
 	fs := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fs))
+	mux.Get("/static/", http.StripPrefix("/static", fs))
 
-	return mux
+	return defaultMiddleware.Then(mux)
 }

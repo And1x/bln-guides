@@ -6,13 +6,14 @@
 
 {{range .Guides}}
 <div class="fullguide">
-    <form class="fullguide-buttons" action="/allguides" method="post">
+<div class="fullguide-buttons">
+    <form action="/deleteguide" method="post">
         <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
-        <input type="submit" name="edit" value="Edit">
         <input type="hidden" name="id" value="{{.Id}}">
     </form>
-{{/* todo: change FullView in either a button or smth */}}
-    <a href="/guide?id={{.Id}}">FullView</a> 
+    <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
+    <a href="/guide/{{.Id}}"><button type="button">FullView</button></a> 
+</div>
     <h2 class="title">Title: {{.Title}}</h2>
     {{.Content}} <br>
 
@@ -23,27 +24,7 @@
     Updated: {{humandate .Updated}} <br>
     {{end}}
 </div>
-
-    {{/* <form action="/editguide" method="post">
-        <input type="submit" value="Edit">
-        <input type="hidden" name="id" value="{{.Id}}">
-    </form> */}}
 </div>
-
 {{end}}
 {{end}}
 
-{{define "js"}}
-<script>
-    let deltrue;
-    function confirmDeletion() {
-        if (confirm("Are you sure to delete?") == true) {
-            deltrue = true;
-            return deltrue;
-        } else {
-            deltrue = false;
-            return deltrue;
-        }
-    }
-</script>
-{{end}}
