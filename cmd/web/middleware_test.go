@@ -5,7 +5,10 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Testing the logging method (to learn, dont see much value in testing the logger)
@@ -42,14 +45,14 @@ func TestLogging(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 
 			// record Response from a request
-			rr := httptest.NewRecorder()
-			r := httptest.NewRequest(test.reqMethod, test.reqURI, nil)
+			res := httptest.NewRecorder()
+			req := httptest.NewRequest(test.reqMethod, test.reqURI, nil)
 
 			// simple Handlerfunc to satisfiy Signature from logging method
 			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			})
 
-			app.logging(next).ServeHTTP(rr, r)
+			app.logging(next).ServeHTTP(res, req)
 
 			if buf.Len() <= 0 {
 				t.Errorf("Nothing written to buffer")
@@ -62,4 +65,22 @@ func TestLogging(t *testing.T) {
 			buf.Reset()
 		})
 	}
+}
+
+func TestRecoverPanic(t *testing.T) {
+
+	app := &app{
+		errorLog: log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile), // errorLog is called by serverError hence its needed in app struct
+	}
+
+	randomHandler := func(http.ResponseWriter, *http.Request) { panic("Help, a panic happend!") }
+	panicHandler := app.recoverPanic(http.HandlerFunc(randomHandler))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	res := httptest.NewRecorder()
+
+	panicHandler.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusInternalServerError, res.Code)
+	assert.Equal(t, res.Header().Values("Connection"), []string{"close"}) // check if in Headermap k="Connection" v="close" is set after panic recovery
 }
