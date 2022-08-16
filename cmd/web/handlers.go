@@ -5,35 +5,15 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/and1x/bln--h/pkg/forms"
 	"github.com/and1x/bln--h/pkg/models"
 )
 
-type TemplateData struct {
-	Guide  *models.Guide
-	Guides []*models.Guide
-	Form   *forms.Form
-}
-
-func humandate(t time.Time) string {
-
-	if t.IsZero() {
-		return ""
-	}
-	return t.Local().Format("02 Jan 2006 at 15:04")
-	//return t.UTC().Format("02 Jan 2006 at 15:04")
-}
-
-var functions = template.FuncMap{
-	"humandate": humandate,
-}
-
-var td TemplateData // middlerware should make this unnecessary
+//var td TemplateData // middlerware should make this unnecessary
 
 func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
-	app.render(w, "./ui/templates/home.tmpl", &td)
+	app.render(w, "./ui/templates/home.tmpl", &TemplateData{})
 
 }
 
@@ -71,6 +51,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
+	td := TemplateData{}
 
 	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
@@ -87,29 +68,6 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, "./ui/templates/editguide.tmpl", &td)
 }
 
-/*
-// editGuideHandler checks if editFrom got saved - then updates DB with edited Values
-func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.FormValue("submitEdit") == "Save" {
-
-		id, err := strconv.Atoi(r.FormValue("id"))
-		if err != nil || id < 1 {
-			app.clientError(w, http.StatusNotFound)
-			return
-		}
-
-		err = app.guides.UpdateById(r.FormValue("title"), r.FormValue("content"), id)
-		if err != nil {
-			app.serverError(w, err)
-			return
-		}
-		http.Redirect(w, r, fmt.Sprintf("/guide/%d", id), http.StatusSeeOther)
-	}
-
-	app.render(w, "./ui/templates/editguide.tmpl", &td)
-}
-*/
 func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
@@ -150,6 +108,7 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 // allGuidesHandler lists all guides
 func (app *app) allGuidesHandler(w http.ResponseWriter, r *http.Request) {
+	td := TemplateData{}
 
 	ga, err := app.guides.GetAll()
 	if err != nil {
@@ -183,6 +142,7 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 // singleGuideHandler handles via URL requested guide - in form like: .../guide?id=123
 func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
+	td := TemplateData{}
 
 	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
@@ -197,19 +157,4 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 	td.Guide = guide
 
 	app.render(w, "./ui/templates/singleguide.tmpl", &td)
-}
-
-func (app *app) render(w http.ResponseWriter, filename string, td *TemplateData) {
-
-	tp, err := template.New("base").Funcs(functions).ParseFiles(filename, "./ui/templates/base.layout.tmpl")
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	err = tp.Execute(w, td)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
 }
