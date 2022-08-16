@@ -1,42 +1,33 @@
 package main
 
 import (
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/http/httptest"
 	"testing"
-	"time"
+
+	_ "github.com/and1x/bln--h/testing_init"
 )
 
-func TestHumanDate(t *testing.T) {
+func TestHomeSiteHandler(t *testing.T) {
 
-	tests := []struct {
-		name string
-		tt   time.Time
-		want string
-	}{
-		{
-			name: "Local",
-			tt:   time.Date(2021, 11, 21, 10, 0, 0, 0, time.Local),
-			want: "21 Nov 2021 at 10:00",
-		},
-		{
-			name: "Empty",
-			tt:   time.Time{},
-			want: "",
-		},
-		{
-			name: "CET",
-			tt:   time.Date(2021, 11, 21, 10, 0, 0, 0, time.FixedZone("CET", 1*60*60)),
-			want: "21 Nov 2021 at 10:00",
-		},
+	app := &app{
+		infoLog:  log.New(ioutil.Discard, "", 0),
+		errorLog: log.New(ioutil.Discard, "", 0),
+		//infoLog:  log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime),
+		//errorLog: log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile),
+	} // mock app
+
+	req := httptest.NewRequest("Get", "/", nil)
+	res := httptest.NewRecorder()
+
+	app.homeSiteHandler(res, req)
+
+	want := http.StatusOK
+	got := res.Code
+
+	if got != want {
+		t.Errorf("want %d but got %d", want, got)
 	}
-
-	for _, tst := range tests {
-		t.Run(tst.name, func(t *testing.T) {
-			hd := humandate(tst.tt)
-
-			if hd != tst.want {
-				t.Errorf("want %q; got %q", tst.want, hd)
-			}
-		})
-	}
-
 }

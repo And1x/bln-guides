@@ -14,7 +14,6 @@ import (
 
 func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, "./ui/templates/home.tmpl", &TemplateData{})
-
 }
 
 // createGuideFormHandler gets called via "get" to show createguide Form
