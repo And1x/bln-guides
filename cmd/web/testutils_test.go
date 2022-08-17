@@ -25,10 +25,16 @@ func newTestApp(t *testing.T, withLog bool) *app {
 		eL = log.New(ioutil.Discard, "", 0)
 	}
 
+	templateCache, err := createTemplateCache("./../../ui/templates/") // need to change path bc of 'go test'
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	return &app{
-		infoLog:  iL,
-		errorLog: eL,
-		guides:   &mock.GuidesModel{},
+		infoLog:       iL,
+		errorLog:      eL,
+		templateCache: templateCache,
+		guides:        &mock.GuidesModel{},
 	}
 }
 

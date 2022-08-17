@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -22,9 +23,10 @@ const (
 )
 
 type app struct {
-	infoLog  *log.Logger
-	errorLog *log.Logger
-	guides   interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
+	infoLog       *log.Logger
+	errorLog      *log.Logger
+	templateCache map[string]*template.Template
+	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetAll() ([]*models.Guide, error)
 		Insert(title, content, author string) (int, error)
@@ -49,11 +51,18 @@ func main() {
 	infoLog.Println("Connected to PostgreSQL")
 	defer db.Close()
 
+	// TemplateCache
+	templateCache, err := createTemplateCache("./ui/templates/")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	//  App
 	app := &app{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		guides:   &postgres.GuidesModel{DB: db},
+		infoLog:       infoLog,
+		errorLog:      errorLog,
+		templateCache: templateCache,
+		guides:        &postgres.GuidesModel{DB: db},
 	}
 
 	// HTTP-Server

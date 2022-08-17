@@ -13,12 +13,12 @@ import (
 //var td TemplateData // middlerware should make this unnecessary
 
 func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
-	app.render(w, "./ui/templates/home.tmpl", &TemplateData{})
+	app.render(w, r, "home.page.tmpl", &TemplateData{})
 }
 
 // createGuideFormHandler gets called via "get" to show createguide Form
 func (app *app) createGuideFormHandler(w http.ResponseWriter, r *http.Request) {
-	app.render(w, "./ui/templates/createguide.tmpl", &TemplateData{
+	app.render(w, r, "createguide.page.tmpl", &TemplateData{
 		Form: forms.New(nil),
 	})
 }
@@ -36,7 +36,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
-		app.render(w, "./ui/templates/createguide.tmpl", &TemplateData{Form: form})
+		app.render(w, r, "createguide.page.tmpl", &TemplateData{Form: form})
 		return
 	}
 
@@ -64,7 +64,7 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	td.Guide = gid
-	app.render(w, "./ui/templates/editguide.tmpl", &td)
+	app.render(w, r, "editguide.page.tmpl", &td)
 }
 
 func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
-		app.render(w, "./ui/templates/editguide.tmpl", &TemplateData{ // if invalid render with edited values not the ones before
+		app.render(w, r, "editguide.page.tmpl", &TemplateData{ // if invalid render with edited values not the ones before
 			Guide: &models.Guide{
 				Id:      id,
 				Title:   form.Get("title"),
@@ -116,7 +116,7 @@ func (app *app) allGuidesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	td.Guides = ga
 
-	app.render(w, "./ui/templates/allguides.tmpl", &td)
+	app.render(w, r, "allguides.page.tmpl", &td)
 }
 
 // deleteGuideHandler deletes selected Guide by id and redirects to allGuides
@@ -155,5 +155,5 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	td.Guide = guide
 
-	app.render(w, "./ui/templates/singleguide.tmpl", &td)
+	app.render(w, r, "singleguide.page.tmpl", &td)
 }

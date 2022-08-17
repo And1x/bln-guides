@@ -3,8 +3,6 @@ package main
 import (
 	"net/http"
 	"testing"
-
-	_ "github.com/and1x/bln--h/testing_init"
 )
 
 // func TestHomeSiteHandler(t *testing.T) {
