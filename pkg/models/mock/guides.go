@@ -36,3 +36,11 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 func (g *GuidesModel) Insert(title, content, author string) (int, error) {
 	return 0, nil
 }
+
+func (g *GuidesModel) DeleteById(id int) error {
+	return nil
+}
+
+func (g *GuidesModel) UpdateById(title, content string, id int) error {
+	return nil
+}

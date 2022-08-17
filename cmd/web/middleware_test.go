@@ -5,10 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Testing the logging method (to learn, dont see much value in testing the logger)
@@ -67,20 +64,22 @@ func TestLogging(t *testing.T) {
 	}
 }
 
-func TestRecoverPanic(t *testing.T) {
+// its working but the panic gets logged in terminal which makes it look messy
+// func TestRecoverPanic(t *testing.T) {
 
-	app := &app{
-		errorLog: log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile), // errorLog is called by serverError hence its needed in app struct
-	}
+// 	app := &app{
+// 		errorLog: log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile), // errorLog is called by serverError hence its needed in app struct
+// 	}
 
-	randomHandler := func(http.ResponseWriter, *http.Request) { panic("Help, a panic happend!") }
-	panicHandler := app.recoverPanic(http.HandlerFunc(randomHandler))
+// 	// randomHandler initiates a panic - which should get recovered
+// 	randomHandler := func(http.ResponseWriter, *http.Request) { panic("Help, a panic happend!") }
+// 	panicHandler := app.recoverPanic(http.HandlerFunc(randomHandler))
 
-	req := httptest.NewRequest("GET", "/", nil)
-	res := httptest.NewRecorder()
+// 	req := httptest.NewRequest("GET", "/", nil)
+// 	res := httptest.NewRecorder()
 
-	panicHandler.ServeHTTP(res, req)
+// 	panicHandler.ServeHTTP(res, req)
 
-	assert.Equal(t, http.StatusInternalServerError, res.Code)
-	assert.Equal(t, res.Header().Values("Connection"), []string{"close"}) // check if in Headermap k="Connection" v="close" is set after panic recovery
-}
+// 	assert.Equal(t, http.StatusInternalServerError, res.Code)
+// 	assert.Equal(t, res.Header().Values("Connection"), []string{"close"}) // check if in Headermap k="Connection" v="close" is set after panic recovery
+// }

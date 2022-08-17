@@ -24,7 +24,7 @@ const (
 type app struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
-	guides   interface { // GuidesModel in guides.go satisfies interface guides hence it implements all methods
+	guides   interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetAll() ([]*models.Guide, error)
 		Insert(title, content, author string) (int, error)
