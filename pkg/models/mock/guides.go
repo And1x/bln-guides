@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"errors"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
@@ -36,8 +37,12 @@ func (g *GuidesModel) Insert(title, content, author string) (int, error) {
 	return 0, nil
 }
 
+// Just Id error considered// not specific DB errors - they get tested seperately
 func (g *GuidesModel) DeleteById(id int) error {
-	return nil
+	if id == 21 {
+		return nil
+	}
+	return errors.New("cannot delete missing id")
 }
 
 func (g *GuidesModel) UpdateById(title, content string, id int) error {

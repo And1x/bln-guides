@@ -70,6 +70,11 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "editguide.page.tmpl", &td)
 }
 
+// editGuideHandler updates a valid post request in the DB
+// ### todo: if id got somehowe changed -
+// ### integrate a way to that users cant change others guides or invalid ones -
+// ### only negative numbers get checked so far
+// ### authentication could solve this
 func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
@@ -110,14 +115,13 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 // allGuidesHandler lists all guides
 func (app *app) allGuidesHandler(w http.ResponseWriter, r *http.Request) {
-	td := TemplateData{}
 
 	ga, err := app.guides.GetAll()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	td.Guides = ga
+	td := TemplateData{Guides: ga}
 
 	app.render(w, r, "allguides.page.tmpl", &td)
 }
@@ -137,14 +141,13 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 			app.serverError(w, err)
 			return
 		}
-		fmt.Println(r.FormValue("id")) //todo: delete in production
+		fmt.Println(r.FormValue("id")) //todo: delete this line when app is in production
 	}
 	http.Redirect(w, r, "/allguides", http.StatusSeeOther)
 }
 
-// singleGuideHandler handles via URL requested guide - in form like: .../guide?id=123
+// singleGuideHandler handles via URL requested guide - in form like: .../guide/123
 func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
-	td := TemplateData{}
 
 	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
@@ -152,11 +155,14 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guide, err := app.guides.GetById(id, true)
-	if err != nil {
+	if err == models.ErrNoRows {
+		app.clientError(w, http.StatusNotFound)
+	} else if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	td.Guide = guide
+
+	td := TemplateData{Guide: guide}
 
 	app.render(w, r, "singleguide.page.tmpl", &td)
 }
