@@ -50,20 +50,23 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
-	td := TemplateData{}
 
 	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
+
 	gid, err := app.guides.GetById(id, false) // false bc edit in md not html
-	if err != nil {
+	if err == models.ErrNoRows {
+		app.clientError(w, http.StatusNotFound)
+	} else if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	td.Guide = gid
+	td := TemplateData{Guide: gid}
+
 	app.render(w, r, "editguide.page.tmpl", &td)
 }
 

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"html/template"
 	"time"
 )
@@ -13,3 +14,5 @@ type Guide struct {
 	Created time.Time
 	Updated time.Time
 }
+
+var ErrNoRows error = sql.ErrNoRows

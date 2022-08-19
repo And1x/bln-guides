@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"testing"
 
@@ -55,6 +56,7 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 	return &testServer{ts}
 }
 
+// get sends a get request to the test server
 func (ts *testServer) get(t *testing.T, urlPath string) (int, http.Header, []byte) {
 	res, err := ts.Client().Get(ts.URL + urlPath)
 	if err != nil {
@@ -68,4 +70,22 @@ func (ts *testServer) get(t *testing.T, urlPath string) (int, http.Header, []byt
 	}
 
 	return res.StatusCode, res.Header, body
+}
+
+//postForm send a post request with form data to the test server
+func (ts *testServer) postForm(t *testing.T, urlPath string, form url.Values) (int, http.Header, []byte) {
+
+	res, err := ts.Client().PostForm(ts.URL+urlPath, form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return res.StatusCode, res.Header, body
+
 }

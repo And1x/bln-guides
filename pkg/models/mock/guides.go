@@ -1,7 +1,6 @@
 package mock
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
@@ -11,8 +10,8 @@ type GuidesModel struct{}
 
 var mockGuide = &models.Guide{
 	Id:      21,
-	Title:   "Can't stop, won't stop!",
-	Content: "Can't rest, can't rest, won't rest, beliving in the proccess - every day's a progress - slow steps, start to love coding - ah yes",
+	Title:   "Cant stop, wont stop!",
+	Content: "Cant rest, cant rest, wont rest, beliving in the proccess - every days a progress - slow steps, start to love coding - ah yes",
 	Author:  "anon",
 	Created: time.Now(),
 	Updated: time.Now(),
@@ -24,7 +23,7 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 	if id == 21 {
 		return mockGuide, nil
 	} else {
-		return nil, sql.ErrNoRows
+		return nil, models.ErrNoRows //sql.ErrNoRows
 	}
 }
 
