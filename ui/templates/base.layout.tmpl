@@ -14,13 +14,24 @@
     <title>{{template "title" .}}</title>
 </head>
 <body>
-<div class="navbar">
+{{/* <div class="navbar">
     <nav>
         <a href="http://localhost:8080/">₿ Home</a>
         <a href="http://localhost:8080/allguides">Guides</a>
         <a href="http://localhost:8080/createguide">Create</a>
-       <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
+        <div class="ToggleDayNight">
+            <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
+       </div>
     </nav>
+</div> */}}
+
+<div class="navbar">
+        <a href="http://localhost:8080/">₿ Home</a>
+        <a href="http://localhost:8080/allguides">Guides</a>
+        <a href="http://localhost:8080/createguide">Create</a>
+        <div class="toggleDayNight">
+            <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
+       </div>
 </div>
 
 {{template "body" .}}   

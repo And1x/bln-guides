@@ -9,11 +9,20 @@ body {
     font-family: Helvetica, Arial, sans-serif;
 
 }
-
+/* Navbar */
 .navbar {
     font-size: 1.5em;
     border-bottom: 3px solid var(--main-frame-color);
+    overflow: hidden;
 }
+/* .navbar a:hover {
+    background-color: aqua;
+    color: black;
+} */
+.toggleDayNight {
+    float: right;
+}
+/* Navbar end */
 
 .fullguide {
     border: 1px double var(--main-frame-color);
@@ -35,6 +44,8 @@ body {
    color: rgb(0, 0, 0);
    text-decoration-line: underline;
 }
+
+
 
 ul {
     background-color: rgba(233, 233, 233, 0.384);
