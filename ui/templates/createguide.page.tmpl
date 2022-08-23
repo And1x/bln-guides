@@ -19,6 +19,13 @@
             <textarea name="content" id="" cols="96" rows="21">{{.Get "content"}}</textarea><br>
         </div>
         <div>
+            <label for="author">Author:</label><br>
+            {{with .Errors.Get "author"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+           <input type="text" name="author" id="guideAuthor" value='{{.Get "author"}}'><br>
+        </div>
+        <div>
             <input type="submit" value="Post">
         </div>
     {{end}}

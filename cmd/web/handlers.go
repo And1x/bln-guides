@@ -32,7 +32,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("title", "content")
+	form.Required("title", "content", "author")
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
@@ -40,7 +40,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), "anon")
+	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), form.Get("author"))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -90,7 +90,7 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("title", "content")
+	form.Required("title", "content", "author")
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
@@ -99,13 +99,14 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 				Id:      id,
 				Title:   form.Get("title"),
 				Content: template.HTML(form.Get("content")),
+				Author:  form.Get("author"),
 			},
 			Form: form,
 		})
 		return
 	}
 
-	err = app.guides.UpdateById(form.Get("title"), form.Get("content"), id) // form.Get returns validated values instead using r.PostFormValues
+	err = app.guides.UpdateById(form.Get("title"), form.Get("content"), form.Get("author"), id) // form.Get returns validated values instead using r.PostFormValues
 	if err != nil {
 		app.serverError(w, err)
 		return

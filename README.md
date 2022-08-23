@@ -1,6 +1,7 @@
 # bln--h
 - Web Page where Users can Login with LNURL-Auth
 - Post Guides in Markdown Language
+- WebLN enabeld when looking at single-guides
 - -> Get Upvotes in Sats
 
 ## Tech-Stack

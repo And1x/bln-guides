@@ -45,6 +45,6 @@ func (g *GuidesModel) DeleteById(id int) error {
 	return errors.New("cannot delete missing id")
 }
 
-func (g *GuidesModel) UpdateById(title, content string, id int) error {
+func (g *GuidesModel) UpdateById(title, content, author string, id int) error {
 	return nil
 }

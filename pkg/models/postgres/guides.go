@@ -95,15 +95,16 @@ func (g *GuidesModel) DeleteById(id int) error {
 	return nil
 }
 
-func (g *GuidesModel) UpdateById(title, content string, id int) error {
+func (g *GuidesModel) UpdateById(title, content, author string, id int) error {
 
 	stmt := `UPDATE guides 
 	SET title = $1,
 	content = $2,
-	updated = $3
-	WHERE id = $4`
+	author = $3,
+	updated = $4
+	WHERE id = $5`
 
-	_, err := g.DB.Exec(stmt, title, content, time.Now(), id)
+	_, err := g.DB.Exec(stmt, title, content, author, time.Now(), id)
 	if err != nil {
 		log.Println(err)
 		return err

@@ -31,7 +31,7 @@ type app struct {
 		GetAll() ([]*models.Guide, error)
 		Insert(title, content, author string) (int, error)
 		DeleteById(id int) error
-		UpdateById(title, content string, id int) error
+		UpdateById(title, content, author string, id int) error
 	}
 }
 
