@@ -15,7 +15,9 @@
 - Create a DB to post guides -> Title, Content, Created_at, Creator
 - -> html forms -> content with markdown enabled -> save content as plain markdown in db -> render it to html as html.ResponseWriter to display at page
 #### 2. Create User
-- connect to DB for authenication?
+- Login with Oauth -> see goth or self implementation
+- lnurl-auth later... 
+- User creates wallet within LNbits to get upvotes
 
 ### Current ToDo List:
 - [x] Go trough handler and add html.StatusCodes for Error returns
