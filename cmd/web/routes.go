@@ -3,10 +3,31 @@ package main
 import (
 	"net/http"
 
-	"github.com/bmizerany/pat"
+	"github.com/go-chi/chi/v5"
 	"github.com/justinas/alice"
 )
 
+func (app *app) routes() http.Handler {
+
+	defaultMiddleware := alice.New(app.recoverPanic, app.logging)
+
+	r := chi.NewRouter()
+	r.Get("/", http.HandlerFunc(app.homeSiteHandler))
+	r.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))
+	r.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))
+	r.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
+	r.Post("/createguide", http.HandlerFunc(app.createGuideHandler))
+	r.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
+	r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
+	r.Get("/guide/{id}", http.HandlerFunc(app.singleGuideHandler))
+
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	return defaultMiddleware.Then(r)
+}
+
+/*
 func (app *app) routes() http.Handler {
 
 	defaultMiddleware := alice.New(app.recoverPanic, app.logging)
@@ -25,4 +46,4 @@ func (app *app) routes() http.Handler {
 	mux.Get("/static/", http.StripPrefix("/static", fs))
 
 	return defaultMiddleware.Then(mux)
-}
+}*/

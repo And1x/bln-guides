@@ -8,6 +8,7 @@ import (
 
 	"github.com/and1x/bln--h/pkg/forms"
 	"github.com/and1x/bln--h/pkg/models"
+	"github.com/go-chi/chi/v5"
 )
 
 //var td TemplateData // middlerware should make this unnecessary
@@ -51,7 +52,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusNotFound)
 		return
@@ -150,11 +151,12 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 // singleGuideHandler handles via URL requested guide - in form like: .../guide/123
 func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusNotFound)
 		return
 	}
+
 	guide, err := app.guides.GetById(id, true)
 	if err == models.ErrNoRows {
 		app.clientError(w, http.StatusNotFound)
