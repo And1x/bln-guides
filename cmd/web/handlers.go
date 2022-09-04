@@ -33,7 +33,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("title", "content", "author")
+	form.Required("title", "content")
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
@@ -41,7 +41,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), form.Get("author"))
+	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), 1) // todo: user_id (1) is hardcoded - get value from session later
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -91,23 +91,22 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("title", "content", "author")
+	form.Required("title", "content")
 	form.MaxLength("title", 80)
 
 	if !form.Valid() {
 		app.render(w, r, "editguide.page.tmpl", &TemplateData{ // if invalid render with edited values not the ones before
 			Guide: &models.Guide{
-				Id:      id,
+				Id:      id, // todo: ID useful here??
 				Title:   form.Get("title"),
 				Content: template.HTML(form.Get("content")),
-				Author:  form.Get("author"),
 			},
 			Form: form,
 		})
 		return
 	}
 
-	err = app.guides.UpdateById(form.Get("title"), form.Get("content"), form.Get("author"), id) // form.Get returns validated values instead using r.PostFormValues
+	err = app.guides.UpdateById(id, form.Get("title"), form.Get("content")) // form.Get returns validated values instead using r.PostFormValues
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -168,4 +167,20 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 	td := TemplateData{Guide: guide}
 
 	app.render(w, r, "singleguide.page.tmpl", &td)
+}
+
+func (app *app) registerUserFormHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "reg form")
+}
+func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "reg usr")
+}
+func (app *app) loginUserFormHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "login form")
+}
+func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "lgoin")
+}
+func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "lout")
 }

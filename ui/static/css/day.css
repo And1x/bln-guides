@@ -19,7 +19,7 @@ body {
     background-color: aqua;
     color: black;
 } */
-.toggleDayNight {
+.navbar-right {
     float: right;
 }
 /* Navbar end */

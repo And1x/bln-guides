@@ -29,9 +29,9 @@ type app struct {
 	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetAll() ([]*models.Guide, error)
-		Insert(title, content, author string) (int, error)
+		Insert(title, content string, userId int) (int, error)
 		DeleteById(id int) error
-		UpdateById(title, content, author string, id int) error
+		UpdateById(id int, title, content string) error
 	}
 }
 

@@ -18,13 +18,13 @@
         {{end}}
         <textarea name="content" id="" cols="80" rows="10">{{.Guide.Content}}</textarea><br>
 
-        <label for="author">Author:</label><br>
+        {{/* <label for="author">Author:</label><br>
         {{with .Form}}
             {{with .Errors.Get "author"}}
                 <label class="error">{{.}}</label><br>
             {{end}}
         {{end}}
-        <input type="text" name="author" id="guideAuthor" value="{{.Guide.Author}}"><br><br>
+        <input type="text" name="author" id="guideAuthor" value="{{.Guide.Author}}"><br><br> */}}
         
         <input type="hidden" name="id" value="{{.Guide.Id}}">
         <input type="submit" name="submitEdit" value="Save">

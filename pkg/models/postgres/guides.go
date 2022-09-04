@@ -19,13 +19,13 @@ type GuidesModel struct {
 // GetById returns a Guide by ID - if inHtml==true then convertes content from md to Html
 func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, author, created, updated FROM guides WHERE id = $1`
+	stmt := `SELECT id, title, content, user_id, created, updated FROM guides WHERE id = $1`
 
 	row := g.DB.QueryRow(stmt, id)
 
 	mg := &models.Guide{}
 
-	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.Author, &mg.Created, &mg.Updated)
+	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated)
 	if err == sql.ErrNoRows {
 		return nil, sql.ErrNoRows
 	} else if err != nil {
@@ -40,7 +40,7 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 
 func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, author, created, updated FROM guides`
+	stmt := `SELECT id, title, content, user_id, created, updated FROM guides`
 
 	rows, err := g.DB.Query(stmt)
 	if err != nil {
@@ -52,7 +52,7 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
 	for rows.Next() {
 		mg := &models.Guide{}
-		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.Author, &mg.Created, &mg.Updated)
+		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated)
 		if err != nil {
 			return nil, err
 		}
@@ -66,16 +66,16 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 	return guides, nil
 }
 
-func (g *GuidesModel) Insert(title, content, author string) (int, error) {
+func (g *GuidesModel) Insert(title, content string, userID int) (int, error) {
 
-	stmt := `INSERT INTO guides (title, content, author, created, updated)
+	stmt := `INSERT INTO guides (title, content, user_id, created, updated)
 	VALUES($1, $2, $3, $4, $5)
 	RETURNING id`
 
 	var id int
 	now := time.Now()
 	// res, err := g.DB.Exec(stmt, title, content, author, time.Now(), time.Now())
-	err := g.DB.QueryRow(stmt, title, content, author, now, now).Scan(&id)
+	err := g.DB.QueryRow(stmt, title, content, userID, now, now).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -95,16 +95,16 @@ func (g *GuidesModel) DeleteById(id int) error {
 	return nil
 }
 
-func (g *GuidesModel) UpdateById(title, content, author string, id int) error {
+func (g *GuidesModel) UpdateById(id int, title, content string) error {
 
+	// ditch user_id in update hence it have to be the same
 	stmt := `UPDATE guides 
 	SET title = $1,
 	content = $2,
-	author = $3,
-	updated = $4
-	WHERE id = $5`
+	updated = $3
+	WHERE id = $4`
 
-	_, err := g.DB.Exec(stmt, title, content, author, time.Now(), id)
+	_, err := g.DB.Exec(stmt, title, content, time.Now(), id)
 	if err != nil {
 		log.Println(err)
 		return err

@@ -32,14 +32,22 @@
 
 | method | route          | handler                | description                                       |
 |--------|----------------|------------------------|---------------------------------------------------|
-| get    | /              | homeSiteHandler        | default home page                                 |
-| get    | /createguide   | createGuideFormHandler | empty Form to create guides                       |
-| post   | /createguide   | createGuideHandler     | insert new guide in DB → redirect to guide/id     |
-| get    | /editguide/id  | editGuideFormHandler   | Form with values from guide by ID                 |
-| post   | /editguide     | editGuideHandler       | Updated edited guide in DB → redirect to guide/id |
-| get    | /allguides     | allGuideHandler        | lists all guides                                  |
-| post   | /deleteguide   | deleteGuideHandler     | deletes Guide by ID                               |
-| get    | /guide/id      | singleGuideHandler     | shows specific guide by ID                        |
+| GET    | /              | homeSiteHandler        | default home page                                 |
+| GET    | /createguide   | createGuideFormHandler | empty Form to create guides                       |
+| POST   | /createguide   | createGuideHandler     | insert new guide in DB → redirect to guide/id     |
+| GET    | /editguide/id  | editGuideFormHandler   | Form with values from guide by ID                 |
+| POST   | /editguide     | editGuideHandler       | Updated edited guide in DB → redirect to guide/id |
+| GET    | /allguides     | allGuideHandler        | lists all guides                                  |
+| POST   | /deleteguide   | deleteGuideHandler     | deletes Guide by ID                               |
+| GET    | /guide/id      | singleGuideHandler     | shows specific guide by ID                        |
+
+| GET    | /user/register | registerUserFormHandler| Form to register new users                        |
+| POST   | /user/register | registerUserHandler    | Create a new user in DB                           |
+
+| GET    | /user/login      | loginUserFormHandler | Form for the Login                                |
+| POST   | /user/login      | loginUserHandler     | Authentication + Login                            |
+| POST   | /user/logout     | logoutUserHandler    | Logout                                            |
+
 
 ### More on lnurl-auth
 - [fiatjaf blog:](https://fiatjaf.com/e0a35204.html)

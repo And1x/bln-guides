@@ -21,6 +21,13 @@ func (app *app) routes() http.Handler {
 	r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
 	r.Get("/guide/{id}", http.HandlerFunc(app.singleGuideHandler))
 
+	r.Get("/user/register", http.HandlerFunc(app.registerUserFormHandler))
+	r.Post("/user/register", http.HandlerFunc(app.registerUserHandler))
+
+	r.Get("/user/login", http.HandlerFunc(app.loginUserFormHandler))
+	r.Post("/user/login", http.HandlerFunc(app.loginUserHandler))
+	r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
+
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 

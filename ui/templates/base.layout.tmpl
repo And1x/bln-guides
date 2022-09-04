@@ -6,7 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> */}}
     {{with .Guide}}
-            <meta name="lightning" content="lnurlp:{{.Author}}"/>
+            {{/* <meta name="lightning" content="lnurlp:{{.Author}}"/> */}}
+            <meta name="lightning" content="lnurlp:And1@stacker.news"/>
             <meta property="og:image" content="/static/img/&1.png">
     {{else}}
         <meta name="lightning" content="lnurlp:And1@stacker.news"/>
@@ -37,8 +38,14 @@
         <a href="http://localhost:8080/">₿ Home</a>
         <a href="http://localhost:8080/allguides">Guides</a>
         <a href="http://localhost:8080/createguide">Create</a>
-        <div class="toggleDayNight">
+        <div class="navbar-right">
             <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
+
+            <a href="/user/register">Register</a>
+            <a href="/user/login">Login</a>
+            <form action="/user/logout" method="post">
+                <button>Logout</button>
+            </form>
        </div>
 </div>
 

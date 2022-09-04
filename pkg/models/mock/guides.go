@@ -13,7 +13,7 @@ var mockGuide = &models.Guide{
 	Id:      21,
 	Title:   "Cant stop, wont stop!",
 	Content: "Cant rest, cant rest, wont rest, beliving in the proccess - every days a progress - slow steps, start to love coding - ah yes",
-	Author:  "anon",
+	UserID:  1,
 	Created: time.Now(),
 	Updated: time.Now(),
 }
@@ -33,7 +33,7 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 	return []*models.Guide{mockGuide}, nil
 }
 
-func (g *GuidesModel) Insert(title, content, author string) (int, error) {
+func (g *GuidesModel) Insert(title, content string, userId int) (int, error) {
 	return 0, nil
 }
 
@@ -45,6 +45,6 @@ func (g *GuidesModel) DeleteById(id int) error {
 	return errors.New("cannot delete missing id")
 }
 
-func (g *GuidesModel) UpdateById(title, content, author string, id int) error {
+func (g *GuidesModel) UpdateById(id int, title, content string) error {
 	return nil
 }

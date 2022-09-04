@@ -38,17 +38,17 @@ func TestCreateGuideHandler(t *testing.T) {
 	defer ts.Close()
 
 	tests := []struct {
-		name        string
-		title       string
-		content     string
-		author      string
+		name    string
+		title   string
+		content string
+		//userID      int
 		wantResCode int
 		wantResBody []byte
 	}{
-		{"Valid Form", "The Great Stick", "Long time ago, a great stick got...", "blaa@getalby.com", http.StatusSeeOther, nil},
-		{"Invalid Form - empty title", "", "why is it like that", "blaa@getalby.com", http.StatusOK, []byte("This field cannot be blank!")},
-		{"Invalid Form - empty content", "The empty c", "", "blaa@getalby.com", http.StatusOK, []byte("This field cannot be blank!")},
-		{"Invalid Form - title to long", "The ridicolously and unnecesary long title which will hopfully fail to be submitted but pass the test bc it's known.......", "bla", "blaa@getalby.com", http.StatusOK, []byte("This field is too long")},
+		{"Valid Form", "The Great Stick", "Long time ago, a great stick got...", http.StatusSeeOther, nil},
+		{"Invalid Form - empty title", "", "why is it like that", http.StatusOK, []byte("This field cannot be blank!")},
+		{"Invalid Form - empty content", "The empty c", "", http.StatusOK, []byte("This field cannot be blank!")},
+		{"Invalid Form - title to long", "The ridicolously and unnecesary long title which will hopfully fail to be submitted but pass the test bc it's known.......", "bla", http.StatusOK, []byte("This field is too long")},
 	}
 
 	for _, test := range tests {
@@ -57,7 +57,6 @@ func TestCreateGuideHandler(t *testing.T) {
 			form := url.Values{}
 			form.Add("title", test.title)
 			form.Add("content", test.content)
-			form.Add("author", test.author)
 
 			resCode, _, body := ts.postForm(t, "/createguide", form)
 
@@ -115,19 +114,19 @@ func TestEditGuideHandler(t *testing.T) {
 	defer ts.Close()
 
 	tests := []struct {
-		name        string
-		id          string
-		title       string
-		content     string
-		author      string
+		name    string
+		id      string
+		title   string
+		content string
+		//UserID int
 		wantResCode int
 		wantResBody []byte
 	}{
-		{"Valid Form", "21", "The Great Stick", "Long time ago, a great stick got...", "blaa@getalby.com", http.StatusSeeOther, nil},
-		{"Invalid Form - empty title", "21", "", "why is it like that", "blaa@getalby.com", http.StatusOK, []byte("This field cannot be blank!")},
-		{"Invalid Form - empty content", "21", "The empty c", "", "blaa@getalby.com", http.StatusOK, []byte("This field cannot be blank!")},
-		{"Invalid Form - title to long", "21", "The ridicolously and unnecesary long title which will hopfully fail to be submitted but pass the test bc it's known.......", "bla", "blaa@getalby.com", http.StatusOK, []byte("This field is too long")},
-		{"Invalid Form - Id changed negative", "-45", "Hello", "how did u change the id?", "blaa@getalby.com", http.StatusNotFound, nil},
+		{"Valid Form", "21", "The Great Stick", "Long time ago, a great stick got...", http.StatusSeeOther, nil},
+		{"Invalid Form - empty title", "21", "", "why is it like that", http.StatusOK, []byte("This field cannot be blank!")},
+		{"Invalid Form - empty content", "21", "The empty c", "", http.StatusOK, []byte("This field cannot be blank!")},
+		{"Invalid Form - title to long", "21", "The ridicolously and unnecesary long title which will hopfully fail to be submitted but pass the test bc it's known.......", "bla", http.StatusOK, []byte("This field is too long")},
+		{"Invalid Form - Id changed negative", "-45", "Hello", "how did u change the id?", http.StatusNotFound, nil},
 		//{"Invalid Form - Id changed no entry", "78", "Hello", "how did u change the id?", http.StatusNotFound, nil},
 	}
 
@@ -137,7 +136,6 @@ func TestEditGuideHandler(t *testing.T) {
 			form := url.Values{}
 			form.Add("title", test.title)
 			form.Add("content", test.content)
-			form.Add("author", test.author)
 			form.Add("id", test.id)
 
 			resCode, _, body := ts.postForm(t, "/editguide", form)
