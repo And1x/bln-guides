@@ -1,0 +1,41 @@
+{{template "base" .}}
+
+{{define "title"}}Register{{end}}
+
+{{define "body"}}
+<form action="/user/register" method="POST" novalidate>
+    {{with .Form}}
+        <div>
+            <label>Name:</label><br>
+            {{with .Errors.Get "name"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input type="text" name="name" value='{{.Get "name"}}'>
+        </div>
+        <div>
+            <label>Lightning Address:</label><br>
+            {{with .Errors.Get "lnaddr"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input type="text" name="lnaddr" value='{{.Get "lnaddr"}}'>
+        </div>
+        <div>
+            <label>Email:</label><br>
+            {{with .Errors.Get "email"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input type="text" name="email" value='{{.Get "email"}}'>
+        </div>
+        <div>
+            <label>Password:</label><br>
+            {{with .Errors.Get "password"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input type="password" name="password">
+        </div>
+        <div>
+            <input type="submit" value="Register">
+        </div>
+    {{end}}
+</form>
+{{end}}
