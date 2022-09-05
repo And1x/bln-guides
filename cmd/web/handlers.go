@@ -169,11 +169,47 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "singleguide.page.tmpl", &td)
 }
 
+// registerUserFormHandler shows Form for Registration
 func (app *app) registerUserFormHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "reg form")
+	app.render(w, r, "register.page.tmpl", &TemplateData{Form: forms.New(nil)})
 }
+
+// registerUserHandler creates a new DB entry with the Users Details
 func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "reg usr")
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("name", "password")
+	form.MinLength("password", 7)
+	form.ValidMail("lnaddr", "email") // if empty no err bc then add name@blnguide.com
+
+	if !form.Valid() {
+		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	// Create new User in DB -- let user redo if email,lnaddr or name is already in DB
+	username := form.Get("name")
+	lnaddr := form.Get("lnaddr")
+	email := form.Get("email")
+	if lnaddr == "" {
+		lnaddr = username + "blnguide.lnd"
+	}
+	if email == "" {
+		email = username + "blnguide.com"
+	}
+	err = app.users.New(form.Get("name"), form.Get("password"), lnaddr, email)
+	if err != nil {
+		app.render(w, r, "register.page.tmpl", &TemplateData{})
+		return
+	}
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+
 }
 func (app *app) loginUserFormHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "login form")

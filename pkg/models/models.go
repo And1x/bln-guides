@@ -7,9 +7,11 @@ import (
 	"time"
 )
 
-var ErrNoRows error = sql.ErrNoRows
+var ErrNoRows error = sql.ErrNoRows // todo: may change
 var ErrInvalidCredentials = errors.New("models: invalid credentials")
-var ErrAlreadyExists = errors.New("models: Already exists")
+var ErrNameAlreadyUsed = errors.New("models: name already used") // todo: maybe better to 1 var like ErrAlreadyExists istead of 3?
+var ErrLnaddrAlreadyUsed = errors.New("models: lnaddresse already used")
+var ErrEmailAlreadyUsed = errors.New("models: Email already used")
 
 type Guide struct {
 	Id      int

@@ -33,6 +33,11 @@ type app struct {
 		DeleteById(id int) error
 		UpdateById(id int, title, content string) error
 	}
+	users interface {
+		New(name, password, lnaddr, email string) error
+		Get(id int) (*models.User, error)
+		Authenticate(name, password string) (int, error)
+	}
 }
 
 func main() {
@@ -63,6 +68,7 @@ func main() {
 		errorLog:      errorLog,
 		templateCache: templateCache,
 		guides:        &postgres.GuidesModel{DB: db},
+		users:         &postgres.UserModel{DB: db},
 	}
 
 	// HTTP-Server

@@ -7,4 +7,5 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/lib/pq v1.10.6
 	github.com/yuin/goldmark v1.4.13
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 )
