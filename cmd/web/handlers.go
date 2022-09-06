@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -197,14 +198,27 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	lnaddr := form.Get("lnaddr")
 	email := form.Get("email")
 	if lnaddr == "" {
-		lnaddr = username + "blnguide.lnd"
+		lnaddr = username + "@blnguide.lnd"
 	}
 	if email == "" {
-		email = username + "blnguide.com"
+		email = username + "@blnguide.com"
 	}
+
 	err = app.users.New(form.Get("name"), form.Get("password"), lnaddr, email)
-	if err != nil {
-		app.render(w, r, "register.page.tmpl", &TemplateData{})
+
+	if err == models.ErrNameAlreadyUsed || err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
+		switch {
+		case err == models.ErrNameAlreadyUsed:
+			form.Errors.Add("name", "Name already exists")
+		case err == models.ErrLnaddrAlreadyUsed:
+			form.Errors.Add("lnaddr", "Lightning Address already exists")
+		case err == models.ErrEmailAlreadyUsed:
+			form.Errors.Add("email", "Email already exists")
+		}
+		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
+		return
+	} else if err != nil {
+		app.serverError(w, err)
 		return
 	}
 
@@ -212,10 +226,30 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 func (app *app) loginUserFormHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "login form")
+	app.render(w, r, "login.page.tmpl", &TemplateData{Form: forms.New(nil)})
 }
 func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "lgoin")
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	id, err := app.users.Authenticate(form.Get("name"), form.Get("password"))
+	if err == models.ErrInvalidCredentials {
+		form.Errors.Add("generic", "Name or password is incorrect")
+		app.render(w, r, "login.page.tmpl", &TemplateData{Form: form})
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	//app session
+	log.Printf(">>>>>>>> authenticated %d", id)
+
+	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "lout")

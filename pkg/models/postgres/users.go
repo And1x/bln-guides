@@ -53,5 +53,26 @@ func (m *UserModel) Get(id int) (*models.User, error) {
 
 // Authenticate checks if user is in DB, returns UserID if successful
 func (m *UserModel) Authenticate(name, password string) (int, error) {
-	return 0, nil
+	var id int
+	var hashPw []byte
+
+	stmt := `SELECT id, password FROM users WHERE name = $1`
+
+	err := m.DB.QueryRow(stmt, name).Scan(&id, &hashPw)
+
+	if err == sql.ErrNoRows {
+		return 0, models.ErrInvalidCredentials
+	} else if err != nil {
+		return 0, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(hashPw, []byte(password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, models.ErrInvalidCredentials
+	} else if err != nil {
+		return 0, nil
+	}
+
+	return id, nil
+
 }

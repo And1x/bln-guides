@@ -13,6 +13,14 @@
             <input type="text" name="name" value='{{.Get "name"}}'>
         </div>
         <div>
+            <label>Password:</label><br>
+            {{with .Errors.Get "password"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input type="password" name="password">
+        </div><br>
+        <div>Not required*</div>
+        <div>
             <label>Lightning Address:</label><br>
             {{with .Errors.Get "lnaddr"}}
                 <label class="error">{{.}}</label>
@@ -26,15 +34,15 @@
             {{end}}
             <input type="text" name="email" value='{{.Get "email"}}'>
         </div>
-        <div>
-            <label>Password:</label><br>
-            {{with .Errors.Get "password"}}
-                <label class="error">{{.}}</label>
-            {{end}}
-            <input type="password" name="password">
-        </div>
+
         <div>
             <input type="submit" value="Register">
+        </div>
+
+        <div><br>
+            *<br>
+            Email is used for Password Recovery. <br>
+            Lightning Address is used to receive Sats for created Guides. <br>
         </div>
     {{end}}
 </form>
