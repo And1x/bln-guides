@@ -37,3 +37,17 @@ func (app *app) recoverPanic(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+// requireAuth reidrects user if userId == 0 -> no user logged; else next hander gets called
+func (app *app) requireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// if userId == 0 then User is not authenticated
+		if app.authUserId(r) == 0 {
+			http.Redirect(w, r, "/user/login", http.StatusFound)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

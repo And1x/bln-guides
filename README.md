@@ -40,10 +40,8 @@
 | GET    | /allguides     | allGuideHandler        | lists all guides                                  |
 | POST   | /deleteguide   | deleteGuideHandler     | deletes Guide by ID                               |
 | GET    | /guide/id      | singleGuideHandler     | shows specific guide by ID                        |
-
 | GET    | /user/register | registerUserFormHandler| Form to register new users                        |
 | POST   | /user/register | registerUserHandler    | Create a new user in DB                           |
-
 | GET    | /user/login      | loginUserFormHandler | Form for the Login                                |
 | POST   | /user/login      | loginUserHandler     | Authentication + Login                            |
 | POST   | /user/logout     | logoutUserHandler    | Logout                                            |

@@ -18,3 +18,7 @@ func (app *app) serverError(w http.ResponseWriter, err error) {
 func (app *app) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
+
+func (app *app) authUserId(r *http.Request) int {
+	return app.session.GetInt(r, "userID")
+}

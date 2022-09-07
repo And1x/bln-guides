@@ -7,24 +7,27 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
 	"github.com/and1x/bln--h/pkg/models/postgres"
+	"github.com/golangcollege/sessions"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
-// instead of const use env vars or cli args
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "and1"
-	password = "4kn0way"
-	dbname   = "blnguide"
-)
+// load .env vars to get config settings
+// todo: extra config package with os.Lookup use if var doesn't exist or use CLI Arguments
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Print(".env File missing")
+	}
+}
 
 type app struct {
 	infoLog       *log.Logger
 	errorLog      *log.Logger
+	session       *sessions.Session
 	templateCache map[string]*template.Template
 	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
@@ -45,8 +48,19 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	// DB Postgresql
-	connectPsql := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	// Setup session
+	seSecret := os.Getenv("SESSION_SECRET")
+	session := sessions.New([]byte(seSecret))
+	session.Lifetime = 8 * time.Hour
+
+	// Setup DB Postgresql
+	host := os.Getenv("bln_pq_host")
+	port := os.Getenv("bln_pq_port")
+	user := os.Getenv("bln_pq_user")
+	password := os.Getenv("bln_pq_password")
+	dbname := os.Getenv("bln_pq_name")
+
+	connectPsql := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
 	db, err := openDB(connectPsql)
@@ -62,10 +76,11 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	//  App
+	// App
 	app := &app{
 		infoLog:       infoLog,
 		errorLog:      errorLog,
+		session:       session,
 		templateCache: templateCache,
 		guides:        &postgres.GuidesModel{DB: db},
 		users:         &postgres.UserModel{DB: db},

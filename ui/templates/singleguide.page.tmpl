@@ -4,14 +4,16 @@
 {{define "body"}}
 
 {{with .Guide}}
-<div class="fullguide-buttons">
-    <form action="/deleteguide" method="post">
-        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
-        <input type="hidden" name="id" value="{{.Id}}">
-    </form>
-    <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
-</div>
 
+{{if eq .UserID $.AuthUserId }}
+    <div class="fullguide-buttons">
+        <form action="/deleteguide" method="post">
+            <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
+            <input type="hidden" name="id" value="{{.Id}}">
+        </form>
+        <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
+    </div>
+{{end}}
     <h2 class="title">Title: {{.Title}}</h2>
     {{.Content}} <br>
 

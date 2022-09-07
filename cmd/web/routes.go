@@ -4,34 +4,51 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/justinas/alice"
 )
 
 func (app *app) routes() http.Handler {
 
-	defaultMiddleware := alice.New(app.recoverPanic, app.logging)
+	// #1
+	//defaultMiddleware := alice.New(app.recoverPanic, app.logging)
+	//statefulMiddleware := alice.New(app.session.Enable)
 
 	r := chi.NewRouter()
-	r.Get("/", http.HandlerFunc(app.homeSiteHandler))
-	r.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))
-	r.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))
-	r.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
-	r.Post("/createguide", http.HandlerFunc(app.createGuideHandler))
-	r.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
-	r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
-	r.Get("/guide/{id}", http.HandlerFunc(app.singleGuideHandler))
+	//r.Get("/", statefulMiddleware.ThenFunc(app.homeSiteHandler).ServeHTTP)
 
-	r.Get("/user/register", http.HandlerFunc(app.registerUserFormHandler))
-	r.Post("/user/register", http.HandlerFunc(app.registerUserHandler))
+	r.Use(app.recoverPanic, app.logging) // register our middleware to all routes
 
-	r.Get("/user/login", http.HandlerFunc(app.loginUserFormHandler))
-	r.Post("/user/login", http.HandlerFunc(app.loginUserHandler))
-	r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
+	r.Group(func(r chi.Router) { // group routes that should have subsequent(following) middleware
+		r.Use(app.session.Enable) // register session middleware
+
+		r.Get("/", http.HandlerFunc(app.homeSiteHandler))
+		r.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))
+		r.Get("/guide/{id}", http.HandlerFunc(app.singleGuideHandler))
+
+		r.Get("/user/register", http.HandlerFunc(app.registerUserFormHandler))
+		r.Post("/user/register", http.HandlerFunc(app.registerUserHandler))
+		r.Get("/user/login", http.HandlerFunc(app.loginUserFormHandler))
+		r.Post("/user/login", http.HandlerFunc(app.loginUserHandler))
+
+		// this group is only for authenticated users accessable
+		r.Group(func(r chi.Router) {
+			r.Use(app.requireAuth)
+			r.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
+			r.Post("/createguide", http.HandlerFunc(app.createGuideHandler))
+			r.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))
+			r.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
+			r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
+			r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
+		})
+
+	})
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
-	return defaultMiddleware.Then(r)
+	// #1
+	//return defaultMiddleware.Then(r)
+
+	return r
 }
 
 /*

@@ -1,7 +1,8 @@
 {{template "base" .}}
-{{define "title"}}Create a new Guide{{end}}
-{{define "body"}}
 
+{{define "title"}}Create a new Guide{{end}}
+
+{{define "body"}}
 <form method="POST" action="/createguide">
     {{with .Form}}
         <div>

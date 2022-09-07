@@ -13,9 +13,11 @@ import (
 )
 
 type TemplateData struct {
-	Guide  *models.Guide
-	Guides []*models.Guide
-	Form   *forms.Form
+	Guide      *models.Guide
+	Guides     []*models.Guide
+	Form       *forms.Form
+	FlashMsg   string
+	AuthUserId int
 }
 
 func humandate(t time.Time) string {
@@ -29,6 +31,36 @@ func humandate(t time.Time) string {
 
 var functions = template.FuncMap{
 	"humandate": humandate,
+}
+
+// render executes the html template(tmpl)
+func (app *app) render(w http.ResponseWriter, r *http.Request, tmpl string, td *TemplateData) {
+
+	ts, ok := app.templateCache[tmpl]
+	if !ok {
+		app.serverError(w, fmt.Errorf("template %s is not in cache", tmpl))
+		return
+	}
+
+	buf := new(bytes.Buffer)
+
+	err := ts.Execute(buf, app.addDefaultData(td, r))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	buf.WriteTo(w)
+}
+
+// addDefaultData adds Data to TemplateData on any render call
+func (app *app) addDefaultData(td *TemplateData, r *http.Request) *TemplateData {
+	if td == nil {
+		td = &TemplateData{}
+	}
+
+	td.AuthUserId = app.authUserId(r) // get User Id from session when User is loggen in - if not -> id = 0
+	td.FlashMsg = app.session.PopString(r, "flashMsg")
+	return td
 }
 
 // createTemplateCache loads all .tmpl in memory instead of reading these files on any page request
@@ -58,22 +90,4 @@ func createTemplateCache(tmplPath string) (map[string]*template.Template, error)
 		cache[name] = ts
 	}
 	return cache, nil
-}
-
-func (app *app) render(w http.ResponseWriter, r *http.Request, tmpl string, td *TemplateData) {
-
-	ts, ok := app.templateCache[tmpl]
-	if !ok {
-		app.serverError(w, fmt.Errorf("template %s is not in cache", tmpl))
-		return
-	}
-
-	buf := new(bytes.Buffer)
-
-	err := ts.Execute(buf, td)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	buf.WriteTo(w)
 }

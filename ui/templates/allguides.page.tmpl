@@ -7,15 +7,20 @@
 {{range .Guides}}
 <div class="fullguide">
 <div class="fullguide-buttons">
-    <form action="/deleteguide" method="post">
-        <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
-        <input type="hidden" name="id" value="{{.Id}}">
-    </form>
-    <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
+    {{if eq .UserID $.AuthUserId }}
+        <form action="/deleteguide" method="post">
+            <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
+            <input type="hidden" name="id" value="{{.Id}}">
+        </form>
+        <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a>
+    {{end}} 
     <a href="/guide/{{.Id}}"><button type="button">FullView</button></a> 
 </div>
     <h2 class="title">Title: {{.Title}}</h2>
     {{.Content}} <br>
+
+    {{.UserID}} <br>
+    {{$.AuthUserId}} <br>
 
 <div class="guide-footer">
     {{/* By: {{.Author}} <br> */}}

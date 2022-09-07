@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -12,10 +11,9 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//var td TemplateData // middlerware should make this unnecessary
-
 func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "home.page.tmpl", &TemplateData{})
+	app.render(w, r, "home.page.tmpl", nil)
+	//app.render(w, r, "home.page.tmpl", &TemplateData{})
 }
 
 // createGuideFormHandler gets called via "get" to show createguide Form
@@ -42,11 +40,16 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), 1) // todo: user_id (1) is hardcoded - get value from session later
+	//get userID from session to know who created the guide
+	loggedinUserId := app.session.GetInt(r, "userID")
+
+	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), loggedinUserId)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	app.session.Put(r, "flashMsg", "New Guide created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/guide/%d", id), http.StatusSeeOther)
 }
@@ -143,8 +146,10 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 			app.serverError(w, err)
 			return
 		}
-		fmt.Println(r.FormValue("id")) //todo: delete this line when app is in production
 	}
+
+	app.session.Put(r, "flashMsg", "Your Guide got deleted!.")
+
 	http.Redirect(w, r, "/allguides", http.StatusSeeOther)
 }
 
@@ -160,14 +165,13 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 	guide, err := app.guides.GetById(id, true)
 	if err == models.ErrNoRows {
 		app.clientError(w, http.StatusNotFound)
+		return
 	} else if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	td := TemplateData{Guide: guide}
-
-	app.render(w, r, "singleguide.page.tmpl", &td)
+	app.render(w, r, "singleguide.page.tmpl", &TemplateData{Guide: guide})
 }
 
 // registerUserFormHandler shows Form for Registration
@@ -222,12 +226,17 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+	app.session.Put(r, "flashMsg", "Successfully registered. Please Login.")
 
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
+
+// loginUserFormHandler shows the Login Form
 func (app *app) loginUserFormHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "login.page.tmpl", &TemplateData{Form: forms.New(nil)})
 }
+
+// loginUserHandler authenticates a user and creates a session for them
 func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -247,10 +256,16 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//app session
-	log.Printf(">>>>>>>> authenticated %d", id)
+	app.session.Put(r, "flashMsg", "Successfully logged in")
+	app.session.Put(r, "userID", id)
 
 	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
+
+// logoutUserHandle removes the UserID from the session -> user insn't authenticated anymore
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "lout")
+
+	app.session.Remove(r, "userID")
+	app.session.Put(r, "flashMsg", "Successfully logged out!")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
