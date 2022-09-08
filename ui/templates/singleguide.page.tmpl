@@ -7,7 +7,8 @@
 
 {{if eq .UserID $.AuthUserId }}
     <div class="fullguide-buttons">
-        <form action="/deleteguide" method="post">
+        <form action="/deleteguide" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
             <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
             <input type="hidden" name="id" value="{{.Id}}">
         </form>

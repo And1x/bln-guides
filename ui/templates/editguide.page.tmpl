@@ -2,6 +2,7 @@
 {{define "title"}}Edit Guide{{end}}
 {{define "body"}}
     <form method="POST" action="/editguide">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <label for="title">Title:</label><br>
         {{with .Form}}
             {{with .Errors.Get "title"}}

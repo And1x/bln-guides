@@ -18,7 +18,7 @@ func (app *app) routes() http.Handler {
 	r.Use(app.recoverPanic, app.logging) // register our middleware to all routes
 
 	r.Group(func(r chi.Router) { // group routes that should have subsequent(following) middleware
-		r.Use(app.session.Enable) // register session middleware
+		r.Use(app.session.Enable, noSurf) // register session middleware // and csrf protection
 
 		r.Get("/", http.HandlerFunc(app.homeSiteHandler))
 		r.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))

@@ -10,6 +10,7 @@ import (
 
 	"github.com/and1x/bln--h/pkg/forms"
 	"github.com/and1x/bln--h/pkg/models"
+	"github.com/justinas/nosurf"
 )
 
 type TemplateData struct {
@@ -18,6 +19,7 @@ type TemplateData struct {
 	Form       *forms.Form
 	FlashMsg   string
 	AuthUserId int
+	CSRFToken  string
 }
 
 func humandate(t time.Time) string {
@@ -60,6 +62,7 @@ func (app *app) addDefaultData(td *TemplateData, r *http.Request) *TemplateData 
 
 	td.AuthUserId = app.authUserId(r) // get User Id from session when User is loggen in - if not -> id = 0
 	td.FlashMsg = app.session.PopString(r, "flashMsg")
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 

@@ -44,6 +44,7 @@
             <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
         {{if .AuthUserId}}
             <form action="/user/logout" method="post">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <button class="button-logout">Logout</button>
             </form>
         {{else}}
