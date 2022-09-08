@@ -25,7 +25,6 @@
 - [ ] Build TestCases
 - [x] Day/Night mode
 ### Possible Todo:
-- [ ] Use own middleware Chains insead of justinas/alice same - seems not that difficult to implement
 - [ ] 
 
  # Routes:

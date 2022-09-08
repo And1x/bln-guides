@@ -169,6 +169,7 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 		app.session.Put(r, "flashMsg", "Your Guide got deleted!.")
 
 		http.Redirect(w, r, "/allguides", http.StatusSeeOther)
+		return
 	}
 
 	// todo: Is this legit? - if handler gets called but can't delete respond with clientErr StatusBadRequest
