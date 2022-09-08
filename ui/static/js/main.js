@@ -1,7 +1,3 @@
-
-
-
-
 let deltrue;
 function confirmDeletion() {
     if (confirm("Are you sure to delete?") == true) {

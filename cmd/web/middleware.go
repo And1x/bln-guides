@@ -38,7 +38,7 @@ func (app *app) recoverPanic(next http.Handler) http.Handler {
 	})
 }
 
-// requireAuth reidrects user if userId == 0 -> no user logged; else next hander gets called
+// requireAuth redirects user if userId == 0 -> no user logged; else next hander gets called
 func (app *app) requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

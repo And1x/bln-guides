@@ -19,6 +19,25 @@ func (app *app) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
+// authUserId returns userID form the user session
 func (app *app) authUserId(r *http.Request) int {
 	return app.session.GetInt(r, "userID")
+}
+
+// isAuthorized checks if the users session ID fits to the guide.UserId he wants to edit/delete
+// todo: probably better as middleware: however this needs to pull guide.Id from GET request(url)
+// and POST request(form) - seems more cumbersome than just use it in handlers
+func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request) bool {
+
+	guide, err := app.guides.GetById(guideId, false)
+	if err != nil {
+		//app.clientError(w, http.StatusNotFound)
+		return false
+	}
+
+	if app.session.GetInt(r, "userID") == guide.UserID {
+		return true
+	} else {
+		return false
+	}
 }

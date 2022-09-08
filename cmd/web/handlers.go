@@ -62,9 +62,17 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// not authorized user trys to edit other users guide/ or guide doesn't exists
+	// todo: if guide doesn't exists, still a StatusForbidden response?
+	if !app.isAuthorized(id, w, r) {
+		app.clientError(w, http.StatusForbidden)
+		return
+	}
+
 	gid, err := app.guides.GetById(id, false) // false bc edit in md not html
 	if err == models.ErrNoRows {
 		app.clientError(w, http.StatusNotFound)
+		return
 	} else if err != nil {
 		app.serverError(w, err)
 		return
@@ -91,6 +99,11 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PostFormValue("id"))
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	if !app.isAuthorized(id, w, r) {
+		app.clientError(w, http.StatusForbidden)
 		return
 	}
 
@@ -141,16 +154,25 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 			app.clientError(w, http.StatusNotFound)
 			return
 		}
+
+		if !app.isAuthorized(id, w, r) {
+			app.clientError(w, http.StatusForbidden)
+			return
+		}
+
 		err = app.guides.DeleteById(id)
 		if err != nil {
 			app.serverError(w, err)
 			return
 		}
+
+		app.session.Put(r, "flashMsg", "Your Guide got deleted!.")
+
+		http.Redirect(w, r, "/allguides", http.StatusSeeOther)
 	}
 
-	app.session.Put(r, "flashMsg", "Your Guide got deleted!.")
-
-	http.Redirect(w, r, "/allguides", http.StatusSeeOther)
+	// todo: Is this legit? - if handler gets called but can't delete respond with clientErr StatusBadRequest
+	app.clientError(w, http.StatusBadRequest)
 }
 
 // singleGuideHandler handles via URL requested guide - in form like: .../guide/123
