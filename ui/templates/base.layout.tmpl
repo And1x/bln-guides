@@ -45,8 +45,9 @@
         {{if .AuthUserId}}
             <form action="/user/logout" method="post">
                 <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-                <button class="button-logout">Logout</button>
+                <button class="button-logout">Logout {{.UserName}}</button>
             </form>
+            <a href="/user/settings">Settings</a>
         {{else}}
             <a href="/user/register">Register</a>
             <a href="/user/login">Login</a>

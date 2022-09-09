@@ -29,21 +29,23 @@
 
  # Routes:
 
-| method | route          | handler                | description                                       |
-|--------|----------------|------------------------|---------------------------------------------------|
-| GET    | /              | homeSiteHandler        | default home page                                 |
-| GET    | /createguide   | createGuideFormHandler | empty Form to create guides                       |
-| POST   | /createguide   | createGuideHandler     | insert new guide in DB → redirect to guide/id     |
-| GET    | /editguide/id  | editGuideFormHandler   | Form with values from guide by ID                 |
-| POST   | /editguide     | editGuideHandler       | Updated edited guide in DB → redirect to guide/id |
-| GET    | /allguides     | allGuideHandler        | lists all guides                                  |
-| POST   | /deleteguide   | deleteGuideHandler     | deletes Guide by ID                               |
-| GET    | /guide/id      | singleGuideHandler     | shows specific guide by ID                        |
-| GET    | /user/register | registerUserFormHandler| Form to register new users                        |
-| POST   | /user/register | registerUserHandler    | Create a new user in DB                           |
-| GET    | /user/login      | loginUserFormHandler | Form for the Login                                |
-| POST   | /user/login      | loginUserHandler     | Authentication + Login                            |
-| POST   | /user/logout     | logoutUserHandler    | Logout                                            |
+| method | route          | handler                 | description                                       |
+|--------|----------------|-------------------------|---------------------------------------------------|
+| GET    | /              | homeSiteHandler         | default home page                                 |
+| GET    | /createguide   | createGuideFormHandler  | empty Form to create guides                       |
+| POST   | /createguide   | createGuideHandler      | insert new guide in DB → redirect to guide/id     |
+| GET    | /editguide/id  | editGuideFormHandler    | Form with values from guide by ID                 |
+| POST   | /editguide     | editGuideHandler        | Updated edited guide in DB → redirect to guide/id |
+| GET    | /allguides     | allGuideHandler         | lists all guides                                  |
+| POST   | /deleteguide   | deleteGuideHandler      | deletes Guide by ID                               |
+| GET    | /guide/id      | singleGuideHandler      | shows specific guide by ID                        |
+| GET    | /user/register | registerUserFormHandler | Form to register new users                        |
+| POST   | /user/register | registerUserHandler     | Create a new user in DB                           |
+| GET    | /user/login    | loginUserFormHandler    | Form for the Login                                |
+| POST   | /user/login    | loginUserHandler        | Authentication + Login                            |
+| POST   | /user/logout   | logoutUserHandler       | Logout                                            |
+| GET    | /user/settings | settingsUserFormHandler | Form to change settings                           |
+| POST   | /user/settings | settingsUserHandler     | Save changed settings                             |
 
 
 ### More on lnurl-auth

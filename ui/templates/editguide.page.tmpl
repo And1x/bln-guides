@@ -1,33 +1,24 @@
 {{template "base" .}}
+
 {{define "title"}}Edit Guide{{end}}
+
 {{define "body"}}
     <form method="POST" action="/editguide">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-        <label for="title">Title:</label><br>
         {{with .Form}}
+            <label for="title">Title:</label><br>
             {{with .Errors.Get "title"}}
                 <label class="error">{{.}}</label><br>
             {{end}}
-        {{end}}
-        <input type="text" name="title" id="guideTitle" value="{{.Guide.Title}}"><br><br>
-
-        <label for="content">Content:</label><br>
-        {{with .Form}}
+            <input type="text" name="title" id="guideTitle" value="{{$.Guide.Title}}"><br><br>
+            <label for="content">Content:</label><br>
             {{with .Errors.Get "content"}}
                 <label class="error">{{.}}</label><br>
             {{end}}
-        {{end}}
-        <textarea name="content" id="" cols="80" rows="10">{{.Guide.Content}}</textarea><br>
-
-        {{/* <label for="author">Author:</label><br>
-        {{with .Form}}
-            {{with .Errors.Get "author"}}
-                <label class="error">{{.}}</label><br>
-            {{end}}
-        {{end}}
-        <input type="text" name="author" id="guideAuthor" value="{{.Guide.Author}}"><br><br> */}}
+            <textarea name="content" id="" cols="80" rows="10">{{$.Guide.Content}}</textarea><br>
         
-        <input type="hidden" name="id" value="{{.Guide.Id}}">
-        <input type="submit" name="submitEdit" value="Save">
+            <input type="hidden" name="id" value="{{$.Guide.Id}}">
+            <input type="submit" name="submitEdit" value="Save">
+        {{end}}
     </form>
 {{end}}

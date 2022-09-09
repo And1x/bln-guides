@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"strings"
 	"time"
 
@@ -46,12 +47,53 @@ func (u *UserModel) New(name, password, lnaddr, email string) error {
 	return err
 }
 
-// Get returns all User Information
-func (m *UserModel) Get(id int) (*models.User, error) {
-	return nil, nil
+// Update updates the users Data, email,lnaddr and password are possible to update
+func (u *UserModel) UpdateByUid(id int, lnaddr, email string) error {
+
+	stmt := `UPDATE users
+		SET lnaddress = $1,
+		email = $2
+		WHERE id = $3`
+
+	_, err := u.DB.Exec(stmt, lnaddr, email, id)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code.Name() == "unique_violation" {
+			switch {
+			case strings.Contains(pqErr.Message, "lnaddress_unique"):
+				return models.ErrLnaddrAlreadyUsed
+			case strings.Contains(pqErr.Message, "email_unique"):
+				return models.ErrEmailAlreadyUsed
+			}
+		}
+	}
+	return err
 }
 
-// Authenticate checks if user is in DB, returns UserID if successful
+// Get returns all User Information
+func (m *UserModel) GetById(id int) (*models.User, error) {
+
+	if id < 1 { // todo: just check 0 better?
+		return nil, errors.New("ivalid UserID")
+	}
+
+	stmt := `SELECT id, name, password, lnaddress, email, created FROM users WHERE id = $1`
+
+	row := m.DB.QueryRow(stmt, id)
+
+	mu := &models.User{}
+
+	err := row.Scan(&mu.Id, &mu.Name, &mu.Password, &mu.LNaddr, &mu.Email, &mu.Created)
+	if err == sql.ErrNoRows {
+		return nil, sql.ErrNoRows
+	} else if err != nil {
+		return nil, err
+	}
+
+	return mu, nil
+}
+
+// Authenticate checks if user-name is in DB, compares password-hashes
+// returns UserID if successful
 func (m *UserModel) Authenticate(name, password string) (int, error) {
 	var id int
 	var hashPw []byte

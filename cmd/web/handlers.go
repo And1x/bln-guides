@@ -18,9 +18,7 @@ func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 // createGuideFormHandler gets called via "get" to show createguide Form
 func (app *app) createGuideFormHandler(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "createguide.page.tmpl", &TemplateData{
-		Form: forms.New(nil),
-	})
+	app.render(w, r, "createguide.page.tmpl", &TemplateData{Form: forms.New(nil)})
 }
 
 func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,9 +76,10 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	td := TemplateData{Guide: gid}
-
-	app.render(w, r, "editguide.page.tmpl", &td)
+	app.render(w, r, "editguide.page.tmpl", &TemplateData{
+		Guide: gid,
+		Form:  forms.New(nil),
+	})
 }
 
 // editGuideHandler updates a valid post request in the DB
@@ -172,7 +171,7 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo: Is this legit? - if handler gets called but can't delete respond with clientErr StatusBadRequest
+	// todo: Is this ResponseCode legit? - if handler gets called but can't delete respond with clientErr StatusBadRequest
 	app.clientError(w, http.StatusBadRequest)
 }
 
@@ -268,7 +267,8 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	id, err := app.users.Authenticate(form.Get("name"), form.Get("password"))
+	name := form.Get("name")
+	id, err := app.users.Authenticate(name, form.Get("password"))
 	if err == models.ErrInvalidCredentials {
 		form.Errors.Add("generic", "Name or password is incorrect")
 		app.render(w, r, "login.page.tmpl", &TemplateData{Form: form})
@@ -281,11 +281,83 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	//app session
 	app.session.Put(r, "flashMsg", "Successfully logged in")
 	app.session.Put(r, "userID", id)
+	app.session.Put(r, "userName", name) // if user successfully logged in we get his userName this way; no need to make a DB request...
 
 	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
 
-// logoutUserHandle removes the UserID from the session -> user insn't authenticated anymore
+// settingsUserFormHandler shows the Settings Page for the User
+func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) {
+
+	loggedinUserId := app.session.GetInt(r, "userID")
+	if loggedinUserId <= 0 {
+		app.clientError(w, http.StatusForbidden) // todo: StatusForbidden appropriate?
+		return
+	}
+
+	userData, err := app.users.GetById(loggedinUserId)
+	if err == models.ErrNoRows {
+		app.clientError(w, http.StatusNotFound)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.render(w, r, "usersettings.page.tmpl", &TemplateData{
+		User: userData, // todo: could this leak more Data than neccessary? maybe it's better just return needed User fields...
+		Form: forms.New(nil),
+	})
+}
+
+// settingsFormHandler saves changed user Settings in DB
+func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	// if r.Form.Get("newPassword") != "" {
+	// 	form.MinLength("newPassword", 7) // todo: change formMinlength to variadic Params -> field ...string
+	// }
+	form.ValidMail("lnaddr", "email")
+
+	if !form.Valid() {
+		app.render(w, r, "usersettings.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	// update DB entry and check if mails already used / add then to form errors in case they are used
+	err = app.users.UpdateByUid(app.authUserId(r), form.Get("lnaddr"), form.Get("email"))
+	if err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
+		switch {
+		case err == models.ErrLnaddrAlreadyUsed:
+			form.Errors.Add("lnaddr", "Lightning Address already exists")
+		case err == models.ErrEmailAlreadyUsed:
+			form.Errors.Add("email", "Email already exists")
+		}
+		app.render(w, r, "usersettings.page.tmpl", &TemplateData{
+			User: &models.User{ // todo: maybe better to show old values again? but need DB probably a new DB req. to get
+				LNaddr: "",
+				Email:  "",
+			},
+			Form: form,
+		})
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.session.Put(r, "flashMsg", "Settings changed.")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	app.session.Remove(r, "userID")

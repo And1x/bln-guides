@@ -97,7 +97,7 @@ func (g *GuidesModel) DeleteById(id int) error {
 
 func (g *GuidesModel) UpdateById(id int, title, content string) error {
 
-	// ditch user_id in update hence it have to be the same
+	// ditch user_id in update hence it have to be from the same user
 	stmt := `UPDATE guides 
 	SET title = $1,
 	content = $2,

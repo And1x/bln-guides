@@ -17,8 +17,10 @@ type TemplateData struct {
 	Guide      *models.Guide
 	Guides     []*models.Guide
 	Form       *forms.Form
+	User       *models.User
+	AuthUserId int // todo: AuthUserId and UserName nedded or just User? we get em by session; no additional DB requests needed which seems like a advantage...
+	UserName   string
 	FlashMsg   string
-	AuthUserId int
 	CSRFToken  string
 }
 
@@ -60,7 +62,8 @@ func (app *app) addDefaultData(td *TemplateData, r *http.Request) *TemplateData 
 		td = &TemplateData{}
 	}
 
-	td.AuthUserId = app.authUserId(r) // get User Id from session when User is loggen in - if not -> id = 0
+	td.AuthUserId = app.authUserId(r) // get User Id from session when User is logged in - if not -> id = 0
+	td.UserName = app.getUserName(r)
 	td.FlashMsg = app.session.PopString(r, "flashMsg")
 	td.CSRFToken = nosurf.Token(r)
 	return td

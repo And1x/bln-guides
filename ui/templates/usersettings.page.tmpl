@@ -1,0 +1,38 @@
+{{template "base" .}}
+
+{{define "title"}}Settings{{end}}
+
+{{define "body"}}
+    <form method="POST" action="/user/settings">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        {{with .Form}}
+
+            <label for="lnaddr">Lightning Address:</label><br>
+            {{with .Errors.Get "lnaddr"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+            <input type="text" name="lnaddr" value="{{$.User.LNaddr}}"><br><br>
+
+            <label for="Email">Email Address:</label><br>
+            {{with .Errors.Get "email"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="text" name="email" value="{{$.User.Email}}"><br><br>
+
+            {{/* <label for="oldPw">Old Password</label><br>
+            {{with .Errors.Get "oldPassword"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="password" name="oldPassword"><br><br>
+
+            <label for="newPw">New Password</label><br>
+            {{with .Errors.Get "newPassword"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="password" name="newPassword"><br><br>
+
+            <label>Repeat??</label><br> */}}
+            <input type="submit" name="submitSettings" value="Save">
+        {{end}}
+    </form>
+{{end}}

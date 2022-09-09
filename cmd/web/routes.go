@@ -37,6 +37,8 @@ func (app *app) routes() http.Handler {
 			r.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))
 			r.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
 			r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
+			r.Get("/user/settings", http.HandlerFunc(app.settingsUserFormHandler))
+			r.Post("/user/settings", http.HandlerFunc(app.settingsUserHandler))
 			r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
 		})
 

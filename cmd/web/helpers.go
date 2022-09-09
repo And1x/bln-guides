@@ -24,6 +24,11 @@ func (app *app) authUserId(r *http.Request) int {
 	return app.session.GetInt(r, "userID")
 }
 
+// getUserName return userName from the user session
+func (app *app) getUserName(r *http.Request) string {
+	return app.session.GetString(r, "userName")
+}
+
 // isAuthorized checks if the users session ID fits to the guide.UserId he wants to edit/delete
 // todo: probably better as middleware: however this needs to pull guide.Id from GET request(url)
 // and POST request(form) - seems more cumbersome than just use it in handlers
