@@ -39,6 +39,7 @@ type app struct {
 	users interface {
 		New(name, password, lnaddr, email string) error
 		UpdateByUid(id int, lnaddr, email string) error
+		UpdatePwByUid(id int, password string) error
 		GetById(id int) (*models.User, error)
 		Authenticate(name, password string) (int, error)
 	}

@@ -39,7 +39,12 @@ func (app *app) routes() http.Handler {
 			r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
 			r.Get("/user/settings", http.HandlerFunc(app.settingsUserFormHandler))
 			r.Post("/user/settings", http.HandlerFunc(app.settingsUserHandler))
+
+			r.Get("/user/settings/password", http.HandlerFunc(app.settingsUserPwFormHandler))
+			r.Post("/user/settings/password", http.HandlerFunc(app.settingsUserPwHandler))
+
 			r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
+
 		})
 
 	})

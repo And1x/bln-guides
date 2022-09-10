@@ -3,6 +3,8 @@
 {{define "title"}}Settings{{end}}
 
 {{define "body"}}
+<br>
+    <a href="/user/settings/password">change Password</a> <br><br>
     <form method="POST" action="/user/settings">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form}}
@@ -19,19 +21,6 @@
             {{end}}
              <input type="text" name="email" value="{{$.User.Email}}"><br><br>
 
-            {{/* <label for="oldPw">Old Password</label><br>
-            {{with .Errors.Get "oldPassword"}}
-                <label class="error">{{.}}</label><br>
-            {{end}}
-             <input type="password" name="oldPassword"><br><br>
-
-            <label for="newPw">New Password</label><br>
-            {{with .Errors.Get "newPassword"}}
-                <label class="error">{{.}}</label><br>
-            {{end}}
-             <input type="password" name="newPassword"><br><br>
-
-            <label>Repeat??</label><br> */}}
             <input type="submit" name="submitSettings" value="Save">
         {{end}}
     </form>

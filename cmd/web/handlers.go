@@ -212,25 +212,24 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 	form.Required("name", "password")
 	form.MinLength("password", 7)
-	form.ValidMail("lnaddr", "email") // if empty no err bc then add name@blnguide.com
+
+	// add default LN- and Mail address if users leaves fields empty
+	// format: name + @example.com
+	if form.Get("lnaddr") == "" {
+		form.Set("lnaddr", form.Get("name")+"@example.com")
+	}
+	if form.Get("email") == "" {
+		form.Set("email", form.Get("name")+"@example.com")
+	}
+
+	form.ValidMail("lnaddr", "email")
 
 	if !form.Valid() {
 		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
 		return
 	}
 
-	// Create new User in DB -- let user redo if email,lnaddr or name is already in DB
-	username := form.Get("name")
-	lnaddr := form.Get("lnaddr")
-	email := form.Get("email")
-	if lnaddr == "" {
-		lnaddr = username + "@blnguide.lnd"
-	}
-	if email == "" {
-		email = username + "@blnguide.com"
-	}
-
-	err = app.users.New(form.Get("name"), form.Get("password"), lnaddr, email)
+	err = app.users.New(form.Get("name"), form.Get("password"), form.Get("lnaddr"), form.Get("email"))
 
 	if err == models.ErrNameAlreadyUsed || err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
 		switch {
@@ -289,7 +288,7 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 // settingsUserFormHandler shows the Settings Page for the User
 func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) {
 
-	loggedinUserId := app.session.GetInt(r, "userID")
+	loggedinUserId := app.session.GetInt(r, "userID") // todo: better with authentiction from dB like PW check instead take it from session
 	if loggedinUserId <= 0 {
 		app.clientError(w, http.StatusForbidden) // todo: StatusForbidden appropriate?
 		return
@@ -304,7 +303,7 @@ func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	app.render(w, r, "usersettings.page.tmpl", &TemplateData{
+	app.render(w, r, "usersetmail.page.tmpl", &TemplateData{
 		User: userData, // todo: could this leak more Data than neccessary? maybe it's better just return needed User fields...
 		Form: forms.New(nil),
 	})
@@ -320,13 +319,16 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	// if r.Form.Get("newPassword") != "" {
-	// 	form.MinLength("newPassword", 7) // todo: change formMinlength to variadic Params -> field ...string
-	// }
 	form.ValidMail("lnaddr", "email")
 
 	if !form.Valid() {
-		app.render(w, r, "usersettings.page.tmpl", &TemplateData{Form: form})
+		app.render(w, r, "usersetmail.page.tmpl", &TemplateData{ // todo: instead to render just call settingsUserFormHandler per GET req and add session Flash MSG for Invalid Form?
+			User: &models.User{
+				LNaddr: form.Get("lnaddr"),
+				Email:  form.Get("email"),
+			},
+			Form: form,
+		})
 		return
 	}
 
@@ -339,10 +341,10 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 		case err == models.ErrEmailAlreadyUsed:
 			form.Errors.Add("email", "Email already exists")
 		}
-		app.render(w, r, "usersettings.page.tmpl", &TemplateData{
-			User: &models.User{ // todo: maybe better to show old values again? but need DB probably a new DB req. to get
-				LNaddr: "",
-				Email:  "",
+		app.render(w, r, "usersetmail.page.tmpl", &TemplateData{
+			User: &models.User{
+				LNaddr: form.Get("lnaddr"),
+				Email:  form.Get("email"),
 			},
 			Form: form,
 		})
@@ -355,6 +357,59 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 	app.session.Put(r, "flashMsg", "Settings changed.")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// settingsUserPwFormHandler shows page to change User password
+func (app *app) settingsUserPwFormHandler(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: forms.New(nil)})
+}
+
+func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	// enough just to check newPassword hence repeat must equal it and old alredy got checked
+	form.MinLength("newPassword", 7)
+	if !form.Valid() {
+		app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	// Authenticate - check old password and name to authenticate and get UserID
+	uid, err := app.users.Authenticate(app.getUserName(r), form.Get("oldPassword"))
+	if err == models.ErrInvalidCredentials {
+		form.Errors.Add("oldPassword", "Password is incorrect") // todo: what if session name got tampered?
+		app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: form})
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// check if newPassword and Repeat Password are the same
+	if form.Get("newPassword") != form.Get("confirmPassword") {
+		form.Errors.Add("newPassword", "New Password is different to confirm new password")
+		app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	// Update DB
+	err = app.users.UpdatePwByUid(uid, form.Get("newPassword"))
+	if err != nil {
+		app.serverError(w, err) // todo: client err maybe bettter?
+		return
+	}
+
+	// redirect with success message
+	app.session.Put(r, "flashMsg", "Password changed.")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
 }
 
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore

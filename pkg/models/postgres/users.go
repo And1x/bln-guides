@@ -69,6 +69,23 @@ func (u *UserModel) UpdateByUid(id int, lnaddr, email string) error {
 	return err
 }
 
+// Update updates the users password
+func (u *UserModel) UpdatePwByUid(id int, password string) error {
+
+	hashPw, err := bcrypt.GenerateFromPassword([]byte(password), 9)
+	if err != nil {
+		return err
+	}
+
+	stmt := `UPDATE users
+		SET password = $1
+		WHERE id = $2`
+
+	_, err = u.DB.Exec(stmt, hashPw, id)
+
+	return err
+}
+
 // Get returns all User Information
 func (m *UserModel) GetById(id int) (*models.User, error) {
 

@@ -53,12 +53,10 @@ func (f *Form) MinLength(field string, min int) {
 	}
 }
 
+// ValidMail check if a mail is valid
 func (f *Form) ValidMail(fields ...string) {
 	for _, field := range fields {
 		value := f.Get(field)
-		if value == "" {
-			return
-		}
 
 		_, err := mail.ParseAddress(value)
 		if err != nil {

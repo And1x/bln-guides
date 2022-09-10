@@ -1,0 +1,30 @@
+{{template "base" .}}
+
+{{define "title"}}Settings{{end}}
+
+{{define "body"}}
+    <form method="POST" action="/user/settings/password">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        {{with .Form}}
+            <label for="oldPw">Old password:</label><br>
+            {{with .Errors.Get "oldPassword"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="password" name="oldPassword"><br><br>
+
+            <label for="newPw">New password:</label><br>
+            {{with .Errors.Get "newPassword"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="password" name="newPassword"><br><br>
+
+            <label for="confirm">Confirm new password:</label><br>
+            {{with .Errors.Get "confirmPassword"}}
+                <label class="error">{{.}}</label><br>
+            {{end}}
+             <input type="password" name="confirmPassword"><br><br>
+
+            <input type="submit" name="submitSettings" value="Save">
+        {{end}}
+    </form>
+{{end}}
