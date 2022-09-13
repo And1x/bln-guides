@@ -1,3 +1,12 @@
+/* 
+- only one css file with mixed colors for dark/normal mode
+- something with backround-image: radial-gradient(color1, color2) - see ch.16 & 17
+- improve navbar
+- clickable guides for fullview?
+- favicon
+- footer
+*/
+
 :root {
     --main-frame-color: rgb(31, 29, 21);
 }
@@ -26,7 +35,7 @@ body {
 
 .fullguide {
     border: 1px double var(--main-frame-color);
-    border-radius: 3em;
+    border-radius: 50%;
     padding: 1em 0.5em;
     margin-bottom: 0.5em;
 }
@@ -37,7 +46,7 @@ body {
 }
 .guide-footer {
     border: 0.1em dotted var(--main-frame-color);
-    border-radius: 8em;
+    border-radius: 50%;
     text-align: center;
 }
 .title {
@@ -49,7 +58,7 @@ body {
 
 ul {
     background-color: rgba(233, 233, 233, 0.384);
-    border-radius: 25px;
+    border-radius: 50%;
 }
 
 a {

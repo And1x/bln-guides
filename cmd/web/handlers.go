@@ -83,10 +83,6 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // editGuideHandler updates a valid post request in the DB
-// ### todo: if id got somehowe changed -
-// ### integrate a way to that users cant change others guides or invalid ones -
-// ### only negative numbers get checked so far
-// ### authentication could solve this
 func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
@@ -171,8 +167,9 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo: Is this ResponseCode legit? - if handler gets called but can't delete respond with clientErr StatusBadRequest
+	// throw client error for cases of invalid request like r.FormValue("delete") != "Delete"
 	app.clientError(w, http.StatusBadRequest)
+
 }
 
 // singleGuideHandler handles via URL requested guide - in form like: .../guide/123
@@ -401,7 +398,7 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	err = app.users.UpdatePwByUid(uid, form.Get("newPassword"))
 	if err != nil {
-		app.serverError(w, err) // todo: client err maybe bettter?
+		app.serverError(w, err)
 		return
 	}
 
