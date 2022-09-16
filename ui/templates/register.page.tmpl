@@ -3,48 +3,51 @@
 {{define "title"}}Register{{end}}
 
 {{define "body"}}
-<form action="/user/register" method="POST" novalidate>
-    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-    {{with .Form}}
-        <div>
-            <label>Name:</label><br>
-            {{with .Errors.Get "name"}}
-                <label class="error">{{.}}</label>
-            {{end}}
-            <input type="text" name="name" value='{{.Get "name"}}'>
-        </div>
-        <div>
-            <label>Password:</label><br>
-            {{with .Errors.Get "password"}}
-                <label class="error">{{.}}</label>
-            {{end}}
-            <input type="password" name="password">
-        </div><br>
-        <div>Not required*</div>
-        <div>
-            <label>Lightning Address:</label><br>
-            {{with .Errors.Get "lnaddr"}}
-                <label class="error">{{.}}</label>
-            {{end}}
-            <input type="text" name="lnaddr" value='{{.Get "lnaddr"}}'>
-        </div>
-        <div>
-            <label>Email:</label><br>
-            {{with .Errors.Get "email"}}
-                <label class="error">{{.}}</label>
-            {{end}}
-            <input type="text" name="email" value='{{.Get "email"}}'>
-        </div>
+<div class="container">
+    <form action="/user/register" method="POST" novalidate>
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        {{with .Form}}
+            <div>
+                <label for="name" >Name:</label>
+                {{with .Errors.Get "name"}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+                <input type="text" id="name" name="name" value='{{.Get "name"}}'>
+            </div>
+            <div>
+                <label for="pw" >Password:</label>
+                {{with .Errors.Get "password"}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+                <input type="password" id ="pw" name="password">
+            </div><br>
+            <div>Not required*</div>
+            <div>
+                <label for="lnaddr" >Lightning Address:</label>
+                {{with .Errors.Get "lnaddr"}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+                <input type="text" id="lnaddr" name="lnaddr" value='{{.Get "lnaddr"}}'>
+            </div>
+            <div>
+                <label for="email" >Email:</label>
+                {{with .Errors.Get "email"}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+                <input type="text" id="email" name="email" value='{{.Get "email"}}'>
+            </div>
 
-        <div>
-            <input type="submit" value="Register">
-        </div>
+            <div>
+                {{/* <input type="submit" value="Register"> */}}
+                <button type="submit" name="register" value="Register">Register</button>
+            </div>
 
-        <div><br>
-            *<br>
-            Email is used for Password Recovery. <br>
-            Lightning Address is used to receive Sats for created Guides. <br>
-        </div>
-    {{end}}
-</form>
+            <div>
+                *<br>
+                Email is used for Password Recovery. <br>
+                Lightning Address is used to receive Sats for created Guides. <br>
+            </div>
+        {{end}}
+    </form>
+</div>
 {{end}}

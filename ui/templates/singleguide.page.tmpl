@@ -4,19 +4,22 @@
 {{define "body"}}
 
 {{with .Guide}}
-
+<div class="fullguide">
+    <div class="fullguide-title-and-buttons">
 {{if eq .UserID $.AuthUserId }}
-    <div class="fullguide-buttons">
         <form action="/deleteguide" method="POST">
             <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
-            <input type="submit" id="delete" onClick="return confirmDeletion()" name="delete" value="Delete">
             <input type="hidden" name="id" value="{{.Id}}">
+            <button type="submit" onClick="return confirmDeletion()" name="delete" value="Delete">Delete</button>
         </form>
-        <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> 
-    </div>
+        <a href="/editguide/{{.Id}}">Edit</a> 
+        {{/* <a href="/editguide/{{.Id}}"><button type="button" name="edit" value="Edit">Edit</button></a>  */}}
+    
 {{end}}
-    <h2 class="title">Title: {{.Title}}</h2>
-    {{.Content}} <br>
+        <div class="title-button-space"></div>
+        <h2 class="title">Title: {{.Title}}</h2>
+    </div>
+    {{.Content}} 
 
 <div class="guide-footer">
     {{/* By: {{.Author}} <br> */}}
@@ -24,6 +27,7 @@
     {{if ne .Created .Updated}}
         Updated: {{humandate .Updated}} <br>
     {{end}}
+</div>
 </div>
 {{end}}
 {{end}}

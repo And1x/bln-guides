@@ -17,43 +17,34 @@
 
 
 
-     <link id="cssstyle" rel="stylesheet" href="/static/css/main.css"> 
+     <link id="cssstyle" rel="stylesheet" href="/static/css/style.css"> 
     {{/* <link rel="stylesheet" href="/static/css/sys-dark-light.css"> Use sys settings for light/dark mode*/}}
-
+    <link rel="icon" type="image/x-icon" href="/static/img/btc.svg">
     <title>{{template "title" .}}</title>
 </head>
 <body>
-{{/* <div class="navbar">
-    <nav>
-        <a href="http://localhost:8080/">₿ Home</a>
-        <a href="http://localhost:8080/allguides">Guides</a>
-        <a href="http://localhost:8080/createguide">Create</a>
-        <div class="ToggleDayNight">
-            <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
-       </div>
-    </nav>
-</div> */}}
 
-<div class="navbar">
+<nav class="navbar">
         <a href="/">₿ Home</a>
         <a href="/allguides">Guides</a>
         {{if .AuthUserId}} {{/* 0 is treated like false */}}
             <a href="/createguide">Create</a>
         {{end}}
+        <div class="navbar-space"></div>
         <div class="navbar-right">
-            <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a>
+            {{/* <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a> */}}
         {{if .AuthUserId}}
+            <a href="/user/settings">Settings</a>
             <form action="/user/logout" method="post">
                 <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <button class="button-logout">Logout {{.UserName}}</button>
             </form>
-            <a href="/user/settings">Settings</a>
         {{else}}
             <a href="/user/register">Register</a>
             <a href="/user/login">Login</a>
         {{end}}
        </div>
-</div>
+</nav>
 <div>
     <section>
         {{with .FlashMsg}}
@@ -62,10 +53,12 @@
     </section>
 </div>
 
-{{template "body" .}}   
+<main>
+    {{template "body" .}}   
+</main>
 
 <div class="footer">
-<a href="https://www.github.com"><img src="/static/img/GitHub-Mark-32px.png"></a>
+    <a class="github-icon" href="https://www.github.com"><img src="/static/img/GitHub-Mark-32px.png">Made by And1x</a>
 </div>
 
 {{block "js" .}}
@@ -76,7 +69,11 @@
 
 {{/* todo: refactor day and night mode - im sure this can be done better */}}
 {{/* ### Day and night mode ### */}}
-var theme = document.getElementById('cssstyle');
+
+
+
+
+{{/* var theme = document.getElementById('cssstyle');
 
 if (localStorage.getItem('darkmode') == null || localStorage.getItem('darkmode') == 'true' ) {
     theme.setAttribute('href', '/static/css/main.css');
@@ -96,7 +93,12 @@ function jsToggleDayNight() {
         location.reload();
         console.log(localStorage.getItem('darkmode'));
     }
- }
+ } */}}
+
+
+
+
+
 {{/* ### Day and night mode ### */}}
 </script>
 </body>

@@ -3,28 +3,31 @@
 {{define "title"}}Settings{{end}}
 
 {{define "body"}}
+<div class="container">
     <form method="POST" action="/user/settings/password">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form}}
-            <label for="oldPw">Old password:</label><br>
+            <label for="oldPw">Old password:</label>
             {{with .Errors.Get "oldPassword"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-             <input type="password" name="oldPassword"><br><br>
+             <input type="password" id="oldPw" name="oldPassword">
 
-            <label for="newPw">New password:</label><br>
+            <label for="newPw">New password:</label>
             {{with .Errors.Get "newPassword"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-             <input type="password" name="newPassword"><br><br>
+             <input type="password" id="newPw" name="newPassword">
 
-            <label for="confirm">Confirm new password:</label><br>
+            <label for="confPw">Confirm new password:</label>
             {{with .Errors.Get "confirmPassword"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-             <input type="password" name="confirmPassword"><br><br>
-
-            <input type="submit" name="submitSettings" value="Save">
+            <input type="password" id="confPw" name="confirmPassword">
+            <div>
+                <button type="submit" name="save" value="Save">Save</button>
+            </div>
         {{end}}
     </form>
+</div>
 {{end}}

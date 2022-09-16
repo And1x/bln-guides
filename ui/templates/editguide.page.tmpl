@@ -3,22 +3,24 @@
 {{define "title"}}Edit Guide{{end}}
 
 {{define "body"}}
+<div class="container">
     <form method="POST" action="/editguide">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form}}
-            <label for="title">Title:</label><br>
+            <label for="title">Title:</label>
             {{with .Errors.Get "title"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" name="title" id="guideTitle" value="{{$.Guide.Title}}"><br><br>
-            <label for="content">Content:</label><br>
+            <input type="text" name="title" id="title" value="{{$.Guide.Title}}">
+            <label for="content">Content:</label>
             {{with .Errors.Get "content"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-            <textarea name="content" id="" cols="80" rows="10">{{$.Guide.Content}}</textarea><br>
+            <textarea name="content" id="content" cols="80" rows="10">{{$.Guide.Content}}</textarea>
         
             <input type="hidden" name="id" value="{{$.Guide.Id}}">
-            <input type="submit" name="submitEdit" value="Save">
+            <button type="submit" name="submitEdit" value="Save">Save</button>
         {{end}}
     </form>
+</div>
 {{end}}

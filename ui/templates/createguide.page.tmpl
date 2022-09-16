@@ -7,28 +7,22 @@
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     {{with .Form}}
         <div>
-            <label for="title">Title:</label><br>
+            <label for="title">Title:</label>
             {{with .Errors.Get "title"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" name="title" id="guideTitle" value='{{.Get "title"}}'><br>
+            <input type="text" name="title" id="title" value='{{.Get "title"}}'>
         </div>
         <div>
-            <label for="content">Content:</label><br>
+            <label for="content">Content:</label>
             {{with .Errors.Get "content"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-            <textarea name="content" id="" cols="96" rows="21">{{.Get "content"}}</textarea><br>
+            <textarea name="content" id="content" cols="96" rows="21">{{.Get "content"}}</textarea>
         </div>
-        {{/* <div>
-            <label for="author">Author:</label><br>
-            {{with .Errors.Get "author"}}
-                <label class="error">{{.}}</label><br>
-            {{end}}
-           <input type="text" name="author" id="guideAuthor" value='{{.Get "author"}}'><br>
-        </div> */}}
+
         <div>
-            <input type="submit" value="Post">
+            <button type="submit" name="create" value="Create">Post</button>
         </div>
     {{end}}
 </form>

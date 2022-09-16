@@ -3,25 +3,26 @@
 {{define "title"}}Settings{{end}}
 
 {{define "body"}}
-<br>
-    <a href="/user/settings/password">change Password</a> <br><br>
+<div class="container">
+    <a href="/user/settings/password">change Password</a> 
     <form method="POST" action="/user/settings">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form}}
 
-            <label for="lnaddr">Lightning Address:</label><br>
+            <label for="lnaddr">Lightning Address:</label>
             {{with .Errors.Get "lnaddr"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" name="lnaddr" value="{{$.User.LNaddr}}"><br><br>
+            <input type="text" id="lnaddr" name="lnaddr" value="{{$.User.LNaddr}}">
 
-            <label for="Email">Email Address:</label><br>
+            <label for="email">Email Address:</label>
             {{with .Errors.Get "email"}}
-                <label class="error">{{.}}</label><br>
+                <label class="error">{{.}}</label>
             {{end}}
-             <input type="text" name="email" value="{{$.User.Email}}"><br><br>
+            <input type="text" id="email" name="email" value="{{$.User.Email}}">
 
-            <input type="submit" name="submitSettings" value="Save">
+            <button type="submit" name="save" value="Save">Save</button>
         {{end}}
     </form>
+</div>
 {{end}}
