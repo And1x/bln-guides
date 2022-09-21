@@ -23,10 +23,13 @@ type Guide struct {
 }
 
 type User struct {
-	Id       int
-	Name     string
-	Password []byte
-	LNaddr   string
-	Email    string
-	Created  time.Time
+	Id            int
+	Name          string
+	Password      []byte
+	LNaddr        string
+	Email         string
+	Created       time.Time
+	LNbUID        string
+	LNbAdminKey   string
+	LNbInvoiceKey string
 }

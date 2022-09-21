@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/and1x/bln--h/pkg/lnbits"
 	"github.com/and1x/bln--h/pkg/models"
 	"github.com/and1x/bln--h/pkg/models/postgres"
 	"github.com/golangcollege/sessions"
@@ -38,10 +39,16 @@ type app struct {
 	}
 	users interface {
 		New(name, password, lnaddr, email string) error
+		UpdateLNbByName(lnbuid, lnbadminkey, lnbinvoice, name string) error
 		UpdateByUid(id int, lnaddr, email string) error
 		UpdatePwByUid(id int, password string) error
 		GetById(id int) (*models.User, error)
+		GetInvoiceKey(id int) (string, error) // todo: needed? more in users.go
 		Authenticate(name, password string) (int, error)
+	}
+	lnProvider interface {
+		CreateUserWallet(userName string) (string, string, string, error)
+		GetBalance(invoiceKey string) (int, error)
 	}
 }
 
@@ -77,6 +84,16 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// LNbits API cofig // todo: other way to inject config??
+	lnbitsConf := map[string]string{
+		"host":        os.Getenv("lnb_host"),
+		"userMgmtEp":  os.Getenv("lnb_apiUserManager"), // lnbits endpoint to create new users
+		"paymentEp":   os.Getenv("lnb_apiInvoice"),     // lnbits endpoint incoming/outgoing invoices
+		"balanceEp":   os.Getenv("lnb_apiBalance"),
+		"adminUID":    os.Getenv("lnb_umAdminUID"),
+		"adminAPIkey": os.Getenv("lnb_umAPIkey"),
+	}
+
 	// App
 	app := &app{
 		infoLog:       infoLog,
@@ -85,6 +102,7 @@ func main() {
 		templateCache: templateCache,
 		guides:        &postgres.GuidesModel{DB: db},
 		users:         &postgres.UserModel{DB: db},
+		lnProvider:    &lnbits.LNbits{Conf: lnbitsConf},
 	}
 
 	// HTTP-Server

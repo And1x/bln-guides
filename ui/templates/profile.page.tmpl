@@ -1,0 +1,21 @@
+{{template "base" .}}
+
+{{define "title"}}Profile{{end}}
+
+{{define "body"}}
+<div class="container">
+    {{/*todo: Check if this is needed -
+     idea is that in case LNbits can't be reached, then profile gets still rendered without Balance*/}}
+    {{with .StringMap.Balance}} 
+    <div>
+        Balance: {{.}}
+    </div>
+    {{end}}
+    <div>
+        <a href="/user/settings">Settings</a>
+    </div>
+    <div>
+        <a href="/user/settings/password">change Password</a> 
+    </div>
+</div>
+{{end}}

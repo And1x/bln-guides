@@ -18,7 +18,8 @@ type TemplateData struct {
 	Guides     []*models.Guide
 	Form       *forms.Form
 	User       *models.User
-	AuthUserId int // todo: AuthUserId and UserName nedded or just User? we get em by session; no additional DB requests needed which seems like a advantage...
+	StringMap  map[string]string // todo: add username/authuserid to this map??
+	AuthUserId int               // todo: AuthUserId and UserName nedded or just User? we get em by session; no additional DB requests needed which seems like a advantage...
 	UserName   string
 	FlashMsg   string
 	CSRFToken  string

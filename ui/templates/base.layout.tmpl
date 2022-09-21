@@ -34,7 +34,7 @@
         <div class="navbar-right">
             {{/* <a href> <img onclick="jsToggleDayNight()" src="/static/img/ligthdark.png" width=30em> </a> */}}
         {{if .AuthUserId}}
-            <a href="/user/settings">Settings</a>
+            <a href="/user/profile">Profile</a>
             <form action="/user/logout" method="post">
                 <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <button class="button-logout">Logout {{.UserName}}</button>

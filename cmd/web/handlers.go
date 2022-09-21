@@ -199,7 +199,14 @@ func (app *app) registerUserFormHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 // registerUserHandler creates a new DB entry with the Users Details
+// in Steps: // todo: better workflow??
+// 1. Get User Reg. Form Data
+// 2. Create User in DB with default(unusable) LNbits values
+// 3. Create LNbits wallet/user
+// 4. Update DB entry with newly created LNbits fields
 func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	// 1.Step
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -226,7 +233,10 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.users.New(form.Get("name"), form.Get("password"), form.Get("lnaddr"), form.Get("email"))
+	name := form.Get("name")
+
+	// 2.Step
+	err = app.users.New(name, form.Get("password"), form.Get("lnaddr"), form.Get("email"))
 
 	if err == models.ErrNameAlreadyUsed || err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
 		switch {
@@ -240,6 +250,20 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
 		return
 	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// 3.Step
+	lnbuid, lnbadminkey, lnbinvoice, err := app.lnProvider.CreateUserWallet(name) //lnbits.CreateUserWallet(name)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// 4.Step
+	err = app.users.UpdateLNbByName(lnbuid, lnbadminkey, lnbinvoice, name)
+	if err != nil {
 		app.serverError(w, err)
 		return
 	}
@@ -282,10 +306,40 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
 
+// profile Handler shows Balance and Nav to Settings/Password change
+func (app *app) profileHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Get invoiceKey from DB to call LnbitsAPI to get Balance
+	loggedinUserId := app.session.GetInt(r, "userID") // todo: 1: see def:
+
+	// if GetInvoiceKey or GetBalance fails -> show Balance currently not available but still render profile Page
+	ikey, err := app.users.GetInvoiceKey(loggedinUserId)
+	if err != nil {
+		app.errorLog.Printf("couldn't receive incoiceKey from DB") // todo: errorlog fine here?
+		app.render(w, r, "profile.page.tmpl", &TemplateData{
+			StringMap: map[string]string{"Balance": fmt.Sprintln("Currently not available")},
+		})
+		return
+	}
+
+	balance, err := app.lnProvider.GetBalance(ikey)
+	if err != nil {
+		app.errorLog.Printf("couldn't get Balance from LNbits")
+		app.render(w, r, "profile.page.tmpl", &TemplateData{
+			StringMap: map[string]string{"Balance": fmt.Sprintln("Currently not available")},
+		})
+		return
+	}
+
+	app.render(w, r, "profile.page.tmpl", &TemplateData{
+		StringMap: map[string]string{"Balance": fmt.Sprintf("%d sats", balance/1000)},
+	})
+}
+
 // settingsUserFormHandler shows the Settings Page for the User
 func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) {
 
-	loggedinUserId := app.session.GetInt(r, "userID") // todo: better with authentiction from dB like PW check instead take it from session
+	loggedinUserId := app.session.GetInt(r, "userID") // todo: 1:def: better with authentiction from dB like PW check instead take it from session
 	if loggedinUserId <= 0 {
 		app.clientError(w, http.StatusForbidden) // todo: StatusForbidden appropriate?
 		return
@@ -412,7 +466,7 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	app.session.Remove(r, "userID")
+	app.session.Remove(r, "userID") // todo remove userName aswell
 	app.session.Put(r, "flashMsg", "Successfully logged out!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

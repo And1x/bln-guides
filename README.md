@@ -24,8 +24,15 @@
 - [x] Build Basic CSS 
 - [ ] Build TestCases
 - [x] Day/Night mode
+- [ ] Check/investigate about Dependency Injection with LNbits (type, config ...)
 ### Possible Todo:
 - [ ] 
+
+### Data stored in session cookie:
+1. temporary session k/v 
+- FlashMsg on: (Guide created, Guide deleted, Registerd, Login, settings changed, password changed, Logout)
+2. normal as long as session is valid
+- userID, userName
 
  # Routes:
 
