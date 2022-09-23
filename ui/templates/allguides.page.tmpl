@@ -9,28 +9,41 @@
 {{range .Guides}}
 <div class="fullguide">
 <div class="fullguide-title-and-buttons">
-    <a class="fullscreen-icon" href="/guide/{{.Id}}"><img src="/static/img/fullscreen.svg"></a>
+
+    {{if ne .UserID $.AuthUserId }}
+        <div>
+            <form action="/allguides" method="post">
+                <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
+                {{/* <input type="hidden" name="uid" value="{{.UserID}}"> */}}
+                <input type="hidden" name="gid" value="{{.Id}}">
+                <button class="button" type="submit" name="upvote" value="Upvote">➕</button> 
+            </form>
+        </div>
+    {{end}}
+    {{/* <a class="fullscreen-icon" href="/guide/{{.Id}}"><img src="/static/img/fullscreen.svg"></a> */}}
+
     {{if eq .UserID $.AuthUserId }}
         
         <form action="/deleteguide" method="post">
             <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
             <input type="hidden" name="id" value="{{.Id}}">
-            <button type="submit" onClick="return confirmDeletion()" name="delete" value="Delete">Delete</button>
+            <button class="button" type="submit" onClick="return confirmDeletion()" name="delete" value="Delete">Delete</button>
         </form>
-        <a href="/editguide/{{.Id}}">Edit</a>
+        <a class="button" href="/editguide/{{.Id}}">Edit</a>
         {{/* <a href="/editguide/{{.Id}}"><button type="button">Edit</button></a> */}}
     {{end}} 
     {{/* <a href="/guide/{{.Id}}"><button type="button">FullView</button></a>  */}}
     <div class="title-button-space"></div>
-    <h2 class="title">Title: {{.Title}}</h2>
+    <a href="/guide/{{.Id}}"><h2 class="title">Title: {{.Title}}</h2></a>
 </div>
     {{.Content}} <br>
 <div class="guide-footer">
     {{/* By: {{.Author}} <br> */}}
     Created: {{humandate .Created}} <br>
     {{if ne .Created .Updated}}
-    Updated: {{humandate .Updated}} <br>
+        Updated: {{humandate .Updated}} <br>
     {{end}}
+     {{.UpvoteAmount}} Sats by {{ .UpvoteUsers }} Users
 </div>
 </div>
 {{end}}

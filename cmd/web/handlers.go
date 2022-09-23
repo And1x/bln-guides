@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/and1x/bln--h/pkg/forms"
 	"github.com/and1x/bln--h/pkg/models"
@@ -306,6 +307,100 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
 
+// upvoteAllGuidesHandler handles the upvote of guides
+func (app *app) upvoteAllGuidesHandler(w http.ResponseWriter, r *http.Request) {
+
+	// step2: get GuideID
+	gid := r.FormValue("gid")
+
+	// step3: call upvote function
+	err := app.upvoteGuide(r, gid)
+
+	if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
+		app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
+		app.allGuidesHandler(w, r)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	} else {
+		// step4: render route we got from step1
+		app.allGuidesHandler(w, r) // todo: is this good practice or render again??
+	}
+}
+
+// upvoteSingleGuideHandler handles the upvote of a specific guide
+func (app *app) upvoteSingleGuideHandler(w http.ResponseWriter, r *http.Request) {
+
+	gid := chi.URLParam(r, "id") // todo: or get it from form.Value guide.id ?
+	err := app.upvoteGuide(r, gid)
+	if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
+		app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
+		app.singleGuideHandler(w, r)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	} else {
+		app.singleGuideHandler(w, r)
+	}
+}
+
+// Using guide_id and user_id?
+// In case the user_Id gets tampered while upvoting
+// the guide receives an upvote but the author of it doesn't receive sats
+// addidtional DB query needed to get User_id from guide_id
+// models.Guides contains both user/guide-id but user could be tamperd
+// hence it's just a hidden field...
+// ---> For now I'll stick with guide ID and do the additional DB Query
+
+// upvoteGuideHandler gives an upvote in sats to the author of the guide
+// func (app *app) upvoteGuideHandler(w http.ResponseWriter, r *http.Request) {
+
+// 	// step1: check if user comes from single-guide or all-guide route
+// 	if r.URL.String() == "/allguides" {
+// 		gid := r.FormValue("gid")
+
+// 		// step3: call upvote function
+// 		err := app.upvoteGuide(r, gid)
+
+// 		if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
+// 			app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
+// 			//app.allGuidesHandler(w, r)
+// 			app.allGuidesHandler(w, r)
+// 			return
+// 		} else if err != nil {
+// 			app.serverError(w, err)
+// 			return
+// 		} else {
+// 			// step4: render route we got from step1
+// 			// app.allGuidesHandler(w, r) // todo: is this good practice or render again??
+// 			app.allGuidesHandler(w, r)
+// 		}
+
+// 	} else if strings.Contains(r.URL.String(), "/singleguide") {
+// 		gid := chi.URLParam(r, "id")
+
+// 		// step3: call upvote function
+// 		err := app.upvoteGuide(r, gid)
+
+// 		if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
+// 			app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
+// 			//app.allGuidesHandler(w, r)
+// 			http.Redirect(w, r, fmt.Sprintf("/guide/%s", gid), http.StatusOK) // todo: Statusok good?
+// 			return
+// 		} else if err != nil {
+// 			app.serverError(w, err)
+// 			return
+// 		} else {
+// 			// step4: render route we got from step1
+// 			// app.allGuidesHandler(w, r) // todo: is this good practice or render again??
+// 			http.Redirect(w, r, fmt.Sprintf("/guide/%s", gid), http.StatusOK) // todo: Statusok good?
+// 		}
+
+// 	}
+// }
+
 // profile Handler shows Balance and Nav to Settings/Password change
 func (app *app) profileHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -371,12 +466,14 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.New(r.PostForm)
 	form.ValidMail("lnaddr", "email")
+	form.IsPositiveNumber("upvote")
 
 	if !form.Valid() {
 		app.render(w, r, "usersetmail.page.tmpl", &TemplateData{ // todo: instead to render just call settingsUserFormHandler per GET req and add session Flash MSG for Invalid Form?
 			User: &models.User{
 				LNaddr: form.Get("lnaddr"),
 				Email:  form.Get("email"),
+				Upvote: form.Get("upvote"),
 			},
 			Form: form,
 		})
@@ -384,7 +481,7 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// update DB entry and check if mails already used / add then to form errors in case they are used
-	err = app.users.UpdateByUid(app.authUserId(r), form.Get("lnaddr"), form.Get("email"))
+	err = app.users.UpdateByUid(app.authUserId(r), form.Get("lnaddr"), form.Get("email"), form.Get("upvote"))
 	if err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
 		switch {
 		case err == models.ErrLnaddrAlreadyUsed:
@@ -396,6 +493,7 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 			User: &models.User{
 				LNaddr: form.Get("lnaddr"),
 				Email:  form.Get("email"),
+				Upvote: form.Get("upvote"),
 			},
 			Form: form,
 		})

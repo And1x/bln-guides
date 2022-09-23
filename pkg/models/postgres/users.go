@@ -69,15 +69,16 @@ func (u *UserModel) UpdateLNbByName(lnbuid, lnbadminkey, lnbinvoice, name string
 	return err
 }
 
-// Update updates the users Data, email,lnaddr and password are possible to update
-func (u *UserModel) UpdateByUid(id int, lnaddr, email string) error {
+// Update updates the users Data, email,lnaddr and Upvote amount are possible to update
+func (u *UserModel) UpdateByUid(id int, lnaddr, email, upvote string) error {
 
 	stmt := `UPDATE users
 		SET lnaddress = $1,
-		email = $2
-		WHERE id = $3`
+		email = $2,
+		upvote = $3
+		WHERE id = $4`
 
-	_, err := u.DB.Exec(stmt, lnaddr, email, id)
+	_, err := u.DB.Exec(stmt, lnaddr, email, upvote, id)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code.Name() == "unique_violation" {
 			switch {
@@ -116,14 +117,14 @@ func (m *UserModel) GetById(id int) (*models.User, error) {
 	}
 
 	// todo: added lnbits stuff here and at row.Scan()
-	stmt := `SELECT id, name, password, lnaddress, email, created, lnb_uid, lnb_adminkey, lnb_invoicekey
+	stmt := `SELECT id, name, password, lnaddress, email, created, lnb_uid, lnb_adminkey, lnb_invoicekey, upvote
 	 FROM users WHERE id = $1`
 
 	row := m.DB.QueryRow(stmt, id)
 
 	mu := &models.User{}
 
-	err := row.Scan(&mu.Id, &mu.Name, &mu.Password, &mu.LNaddr, &mu.Email, &mu.Created, &mu.LNbUID, &mu.LNbAdminKey, &mu.LNbInvoiceKey)
+	err := row.Scan(&mu.Id, &mu.Name, &mu.Password, &mu.LNaddr, &mu.Email, &mu.Created, &mu.LNbUID, &mu.LNbAdminKey, &mu.LNbInvoiceKey, &mu.Upvote)
 	if err == sql.ErrNoRows {
 		return nil, sql.ErrNoRows
 	} else if err != nil {
@@ -133,7 +134,7 @@ func (m *UserModel) GetById(id int) (*models.User, error) {
 	return mu, nil
 }
 
-// GetInvoiceKey // todo: this way pull complete UserData from DB - see. GetById
+// GetInvoiceKey // todo: this way or just pull complete UserData from DB - see. GetById
 func (m *UserModel) GetInvoiceKey(id int) (string, error) {
 
 	if id < 1 { // todo: just check 0 better?
@@ -155,6 +156,53 @@ func (m *UserModel) GetInvoiceKey(id int) (string, error) {
 
 	return ik, nil
 }
+
+// GetInvoiceKey // todo: this way or just pull complete UserData from DB - see. GetById
+func (m *UserModel) GetAdminKeyAndUpvoteAmount(id int) (string, int, error) {
+
+	if id < 1 { // todo: just check 0 better?
+		return "", 0, errors.New("ivalid UserID")
+	}
+
+	stmt := `SELECT lnb_adminkey, upvote FROM users WHERE id = $1`
+
+	row := m.DB.QueryRow(stmt, id)
+
+	var ak string
+	var up int
+
+	err := row.Scan(&ak, &up)
+	if err == sql.ErrNoRows {
+		return "", 0, sql.ErrNoRows
+	} else if err != nil {
+		return "", 0, err
+	}
+
+	return ak, up, nil
+}
+
+// // GetUpvoteAmount // todo: this way or just pull complete UserData from DB - see. GetById
+// func (m *UserModel) GetUpvoteAmount(id int) (int, error) {
+
+// 	if id < 1 { // todo: just check 0 better?
+// 		return 0, errors.New("ivalid UserID")
+// 	}
+
+// 	stmt := `SELECT upvote FROM users WHERE id = $1`
+
+// 	row := m.DB.QueryRow(stmt, id)
+
+// 	var amount int
+
+// 	err := row.Scan(&amount)
+// 	if err == sql.ErrNoRows {
+// 		return 0, sql.ErrNoRows
+// 	} else if err != nil {
+// 		return 0, err
+// 	}
+
+// 	return amount, nil
+// }
 
 // Authenticate checks if user-name is in DB, compares password-hashes
 // returns UserID if successful
@@ -180,5 +228,4 @@ func (m *UserModel) Authenticate(name, password string) (int, error) {
 	}
 
 	return id, nil
-
 }

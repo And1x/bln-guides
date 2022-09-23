@@ -8,8 +8,6 @@ import (
 	"net/url"
 	"os"
 	"testing"
-
-	"github.com/and1x/bln--h/pkg/models/mock"
 )
 
 // newTestApp returns a mocked app instance
@@ -35,7 +33,7 @@ func newTestApp(t *testing.T, withLog bool) *app {
 		infoLog:       iL,
 		errorLog:      eL,
 		templateCache: templateCache,
-		guides:        &mock.GuidesModel{},
+		//guides:        &mock.GuidesModel{},
 	}
 }
 

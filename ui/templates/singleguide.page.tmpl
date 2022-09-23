@@ -6,16 +6,27 @@
 {{with .Guide}}
 <div class="fullguide">
     <div class="fullguide-title-and-buttons">
-{{if eq .UserID $.AuthUserId }}
-        <form action="/deleteguide" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
-            <input type="hidden" name="id" value="{{.Id}}">
-            <button type="submit" onClick="return confirmDeletion()" name="delete" value="Delete">Delete</button>
-        </form>
-        <a href="/editguide/{{.Id}}">Edit</a> 
-        {{/* <a href="/editguide/{{.Id}}"><button type="button" name="edit" value="Edit">Edit</button></a>  */}}
-    
-{{end}}
+
+        {{if ne .UserID $.AuthUserId }}
+            <div>
+                <form action="/guide/{{.Id}}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
+                    {{/* <input type="hidden" name="uid" value="{{.UserID}}"> */}}
+                    <input type="hidden" name="gid" value="{{.Id}}">
+                    <button class="button" type="submit" name="upvote" value="Upvote">➕</button> 
+                </form>
+            </div>
+        {{end}}
+
+        {{if eq .UserID $.AuthUserId }}
+            <form action="/deleteguide" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
+                <input type="hidden" name="id" value="{{.Id}}">
+                <button class="button" type="submit" onClick="return confirmDeletion()" name="delete" value="Delete">Delete</button>
+            </form>
+            <a class="button" href="/editguide/{{.Id}}">Edit</a> 
+            {{/* <a href="/editguide/{{.Id}}"><button type="button" name="edit" value="Edit">Edit</button></a>  */}}
+        {{end}}
         <div class="title-button-space"></div>
         <h2 class="title">Title: {{.Title}}</h2>
     </div>
@@ -27,6 +38,7 @@
     {{if ne .Created .Updated}}
         Updated: {{humandate .Updated}} <br>
     {{end}}
+    {{.UpvoteAmount}} Sats by {{ .UpvoteUsers }} Users
 </div>
 </div>
 {{end}}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/mail"
 	"net/url"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,6 +13,8 @@ type Form struct {
 	url.Values
 	Errors errors
 }
+
+// todo: Rewrite error field with better messages
 
 // New initialzes a new Form struct with specific data as param
 func New(data url.Values) *Form {
@@ -28,6 +31,20 @@ func (f *Form) Required(fields ...string) {
 		if strings.TrimSpace(value) == "" {
 			f.Errors.Add(field, "This field cannot be blank!")
 		}
+	}
+}
+
+// IsPositiveNumber checks that input is a number that is > 0
+func (f *Form) IsPositiveNumber(field string) {
+	value := f.Get(field)
+	valueInt, err := strconv.Atoi(value)
+	if err != nil {
+		f.Errors.Add(field, "This field got not a number")
+		return
+	}
+	if valueInt <= 0 {
+		f.Errors.Add(field, "This field needs number > 0")
+		return
 	}
 }
 

@@ -32,23 +32,29 @@ type app struct {
 	templateCache map[string]*template.Template
 	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
+		GetUidByID(id int) (int, error)
 		GetAll() ([]*models.Guide, error)
 		Insert(title, content string, userId int) (int, error)
 		DeleteById(id int) error
 		UpdateById(id int, title, content string) error
+		AddToUpvotes(id, amount int) error
+		AddToUpvoteUserCount(id, payerUid int) error
 	}
 	users interface {
 		New(name, password, lnaddr, email string) error
 		UpdateLNbByName(lnbuid, lnbadminkey, lnbinvoice, name string) error
-		UpdateByUid(id int, lnaddr, email string) error
+		UpdateByUid(id int, lnaddr, email, upvote string) error
 		UpdatePwByUid(id int, password string) error
 		GetById(id int) (*models.User, error)
-		GetInvoiceKey(id int) (string, error) // todo: needed? more in users.go
+		GetInvoiceKey(id int) (string, error)                   // todo: needed? more in users.go
+		GetAdminKeyAndUpvoteAmount(id int) (string, int, error) // todo: needed? more in users.go
 		Authenticate(name, password string) (int, error)
 	}
 	lnProvider interface {
 		CreateUserWallet(userName string) (string, string, string, error)
 		GetBalance(invoiceKey string) (int, error)
+		CreateInvoice(invoiceKey string, amount int) (string, string, error)
+		PayInvoice(paymentRequest, paymentHash, adminKey string) (bool, error)
 	}
 }
 

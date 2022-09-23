@@ -41,8 +41,13 @@ main {
 
 }
 
-button,
 a {
+    color: var(--font-color);
+}
+/* todo: add a:hover effect and maybe a:after tooo */
+
+
+.button {
     background-color: transparent;
     color: var(--font-color);
     border: 1px solid black;
@@ -55,8 +60,7 @@ a {
     padding: 0.1em 0.1em;
 }
 
-button:hover,
-a:hover {
+.button:hover {
     background-color: var(--btn-hover-color);
     color: black;
 }
@@ -135,14 +139,14 @@ ul {
     background-color: transparent;
 }
 
-.fullscreen-icon {
+/* .fullscreen-icon {
     width: 30px;
     border: none;
 }
 
 .fullscreen-icon:hover {
     background-color: transparent;
-}
+} */
 
 /* || Input Fields */
 label {
@@ -170,4 +174,8 @@ input {
 
 .container button{
     display: block;
+}
+
+.mb5 {
+    margin-bottom: 1em;
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/and1x/bln--h/pkg/models"
+	"github.com/lib/pq"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 )
@@ -19,13 +20,15 @@ type GuidesModel struct {
 // GetById returns a Guide by ID - if inHtml==true then convertes content from md to Html
 func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, user_id, created, updated FROM guides WHERE id = $1`
+	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid FROM guides WHERE id = $1`
 
 	row := g.DB.QueryRow(stmt, id)
 
 	mg := &models.Guide{}
+	upvotesByUid := []sql.NullInt16{} // used for conversion of psql array field
 
-	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated)
+	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid))
+	//err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&mg.UpvoteUsers))
 	if err == sql.ErrNoRows {
 		return nil, sql.ErrNoRows
 	} else if err != nil {
@@ -35,12 +38,34 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 		mg.Content = mdToHtml(mg.Content)
 	}
 
+	// upvote is an array of uid in DB - just use length to show Upvote amount
+	mg.UpvoteUsers = len(upvotesByUid)
+
 	return mg, nil
+}
+
+// GetUidByID gets the User_ID of the guide // todo: rename function
+func (g *GuidesModel) GetUidByID(id int) (int, error) {
+
+	stmt := `SELECT user_id FROM guides WHERE id = $1`
+
+	row := g.DB.QueryRow(stmt, id)
+
+	var uid int
+
+	err := row.Scan(&uid)
+	if err == sql.ErrNoRows {
+		return 0, sql.ErrNoRows
+	} else if err != nil {
+		return 0, err
+	}
+
+	return uid, nil
 }
 
 func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, user_id, created, updated FROM guides`
+	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid FROM guides`
 
 	rows, err := g.DB.Query(stmt)
 	if err != nil {
@@ -52,16 +77,23 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
 	for rows.Next() {
 		mg := &models.Guide{}
-		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated)
+		upvotesByUid := []sql.NullInt16{}
+
+		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid))
 		if err != nil {
 			return nil, err
 		}
+		// convert before appending to []guides
 		mg.Content = mdToHtml(mg.Content)
+		mg.UpvoteUsers = len(upvotesByUid)
+
 		guides = append(guides, mg)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
+	//fmt.Println("length...", guides[3].UpvoteUsers, len(guides[3].UpvoteUsers))
 
 	return guides, nil
 }
@@ -97,16 +129,44 @@ func (g *GuidesModel) DeleteById(id int) error {
 
 func (g *GuidesModel) UpdateById(id int, title, content string) error {
 
-	// ditch user_id in update hence it have to be from the same user
 	stmt := `UPDATE guides 
-	SET title = $1,
-	content = $2,
-	updated = $3
-	WHERE id = $4`
+			SET title = $1,
+			content = $2,
+			updated = $3
+			WHERE id = $4`
 
 	_, err := g.DB.Exec(stmt, title, content, time.Now(), id)
 	if err != nil {
-		log.Println(err)
+		log.Println(err) // todo: infolog - or just return err and log later..
+		return err
+	}
+	return nil
+}
+
+func (g *GuidesModel) AddToUpvotes(id, amount int) error {
+
+	stmt := `UPDATE guides
+			SET up_total = up_total + $1
+			WHERE id = $2`
+
+	_, err := g.DB.Exec(stmt, amount, id)
+	if err != nil {
+		log.Println(err) // todo: infolog - or just return err and log later..
+		return err
+	}
+	return nil
+}
+
+func (g *GuidesModel) AddToUpvoteUserCount(id, payerUid int) error {
+
+	stmt := `UPDATE guides
+			SET ups_by_uid = CASE WHEN CAST($1 AS INTEGER) = ANY(ups_by_uid) 
+			THEN ups_by_uid ELSE ARRAY_APPEND(ups_by_uid, CAST($1 AS INTEGER)) END
+			WHERE id = $2`
+
+	_, err := g.DB.Exec(stmt, payerUid, id)
+	if err != nil {
+		log.Println(err) // todo: infolog - or just return err and log later..
 		return err
 	}
 	return nil

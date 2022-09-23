@@ -38,6 +38,9 @@ func (app *app) routes() http.Handler {
 			r.Post("/editguide", http.HandlerFunc(app.editGuideHandler))
 			r.Get("/editguide/{id}", http.HandlerFunc(app.editGuideFormHandler))
 
+			r.Post("/allguides", http.HandlerFunc(app.upvoteAllGuidesHandler))
+			r.Post("/guide/{id}", http.HandlerFunc(app.upvoteSingleGuideHandler))
+
 			r.Get("/user/profile", http.HandlerFunc(app.profileHandler))
 
 			r.Get("/user/settings", http.HandlerFunc(app.settingsUserFormHandler))

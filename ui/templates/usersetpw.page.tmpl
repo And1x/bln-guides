@@ -11,19 +11,19 @@
             {{with .Errors.Get "oldPassword"}}
                 <label class="error">{{.}}</label>
             {{end}}
-             <input type="password" id="oldPw" name="oldPassword">
+             <input class="mb5" type="password" id="oldPw" name="oldPassword">
 
             <label for="newPw">New password:</label>
             {{with .Errors.Get "newPassword"}}
                 <label class="error">{{.}}</label>
             {{end}}
-             <input type="password" id="newPw" name="newPassword">
+             <input class="mb5" type="password" id="newPw" name="newPassword">
 
             <label for="confPw">Confirm new password:</label>
             {{with .Errors.Get "confirmPassword"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input type="password" id="confPw" name="confirmPassword">
+            <input class="mb5" type="password" id="confPw" name="confirmPassword">
             <div>
                 <button type="submit" name="save" value="Save">Save</button>
             </div>

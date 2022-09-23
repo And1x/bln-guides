@@ -14,12 +14,14 @@ var ErrLnaddrAlreadyUsed = errors.New("models: lnaddresse already used")
 var ErrEmailAlreadyUsed = errors.New("models: Email already used")
 
 type Guide struct {
-	Id      int
-	Title   string
-	Content template.HTML
-	UserID  int
-	Created time.Time
-	Updated time.Time
+	Id           int
+	Title        string
+	Content      template.HTML
+	UserID       int
+	Created      time.Time
+	Updated      time.Time
+	UpvoteAmount int
+	UpvoteUsers  int //[]sql.NullInt16 // todo: change type to just int and convert in sql function GetById and GetAll...
 }
 
 type User struct {
@@ -32,4 +34,5 @@ type User struct {
 	LNbUID        string
 	LNbAdminKey   string
 	LNbInvoiceKey string
+	Upvote        string // todo: int more appropriate but form.Values returns always strings..
 }

@@ -4,7 +4,7 @@
 
 {{define "body"}}
 <div class="container">
-    <a href="/user/settings/password">change Password</a> 
+    {{/* <a href="/user/settings/password">change Password</a>  */}}
     <form method="POST" action="/user/settings">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form}}
@@ -13,13 +13,19 @@
             {{with .Errors.Get "lnaddr"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" id="lnaddr" name="lnaddr" value="{{$.User.LNaddr}}">
+            <input class="mb5" type="text" id="lnaddr" name="lnaddr" value="{{$.User.LNaddr}}">
 
             <label for="email">Email Address:</label>
             {{with .Errors.Get "email"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" id="email" name="email" value="{{$.User.Email}}">
+            <input class="mb5" type="text" id="email" name="email" value="{{$.User.Email}}">
+
+            <label for="upvote">Default upvote amount:</label>
+            {{with .Errors.Get "upvote"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input class="mb5" type="text" id="upvote" name="upvote" value="{{$.User.Upvote}}">
 
             <button type="submit" name="save" value="Save">Save</button>
         {{end}}
