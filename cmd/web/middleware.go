@@ -7,18 +7,14 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-// todo: Reasearch if necessary - couldn't find clear anwsers
-// Im using template/html which already esacapse html injection...
-/*
-func setSecureHeader(next http.Handler) http.Handler {
+func (app *app) setSecureHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("X-XSS-Protection", "1; mode=block") // only useful for older browsers
 		w.Header().Set("X-Frame-Options", "deny")
 
 		next.ServeHTTP(w, r)
 	})
 }
-*/
 
 func (app *app) logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

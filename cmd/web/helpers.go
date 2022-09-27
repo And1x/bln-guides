@@ -14,8 +14,7 @@ func (app *app) serverError(w http.ResponseWriter, err error) {
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-// clientError sends http Status Error to the User -
-// (used for consistency eg. app.serverError and app.clientError)
+// clientError sends http Status Error to the User - e.g. when there is a "Bad Request"
 func (app *app) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
@@ -31,13 +30,12 @@ func (app *app) getUserName(r *http.Request) string {
 }
 
 // isAuthorized checks if the users session ID fits to the guide.UserId he wants to edit/delete
-// todo: probably better as middleware: however this needs to pull guide.Id from GET request(url)
 // and POST request(form) - seems more cumbersome than just use it in handlers
 func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request) bool {
 
 	guide, err := app.guides.GetById(guideId, false)
 	if err != nil {
-		//app.clientError(w, http.StatusNotFound)
+		app.errorLog.Printf("couldn't get guide from DB: %v", err) //todo: errorhandling in this case?
 		return false
 	}
 
@@ -48,26 +46,25 @@ func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request
 	}
 }
 
-// upvoteGuide sends a Payment to the author of a guide // todo: better description
+// upvoteGuide sends a Payment to the author of a guide
+// 1. create Invoice (author)
+// 2. pay Invoice (Upvoter)
 func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 
 	// get InvoiceKey from author of the guide
 	gid, err := strconv.Atoi(guideId)
-	fmt.Println(">>>>>>>>>>>>>>", gid)
+
 	if err != nil {
-		app.errorLog.Println(err) // todo: here err?
 		return err
 	}
 	// query DB to get authors user_Id from guide_id
 	uid, err := app.guides.GetUidByID(gid)
 	if err != nil {
-		app.errorLog.Println(err) // todo: here err?
 		return err
 	}
 
 	ik, err := app.users.GetInvoiceKey(uid)
 	if err != nil {
-		app.errorLog.Println(err) // todo: here err?
 		return err
 	}
 
@@ -76,20 +73,19 @@ func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 
 	ak, amount, err := app.users.GetAdminKeyAndUpvoteAmount(payer)
 	if err != nil {
-		app.errorLog.Println(err) // todo: here err?
 		return err
 	}
 
 	// paymentHash and PaymentRequest needed to pay Invoice
 	ph, pr, err := app.lnProvider.CreateInvoice(ik, amount)
 	if err != nil {
-		app.errorLog.Println(err) // todo: here err?
 		return err
 	}
 
 	// pay invoice with user who is currently logged in
 	isPayed, err := app.lnProvider.PayInvoice(pr, ph, ak)
 
+	// todo: Refactor this part: cleaner err handling with API errors
 	if isPayed {
 		// after payment add it to the Upvote amount of the guide
 		err = app.guides.AddToUpvotes(gid, amount)

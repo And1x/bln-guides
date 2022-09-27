@@ -36,29 +36,41 @@
 
  # Routes:
 
-| method | route                   | handler                   | description                                       |
-|--------|-------------------------|---------------------------|---------------------------------------------------|
-| GET    | /                       | homeSiteHandler           | default home page                                 |
-| GET    | /createguide            | createGuideFormHandler    | empty Form to create guides                       |
-| POST   | /createguide            | createGuideHandler        | insert new guide in DB → redirect to guide/id     |
-| GET    | /editguide/id           | editGuideFormHandler      | Form with values from guide by ID                 |
-| POST   | /editguide              | editGuideHandler          | Updated edited guide in DB → redirect to guide/id |
-| GET    | /allguides              | allGuideHandler           | lists all guides                                  |
-| POST   | /deleteguide            | deleteGuideHandler        | deletes Guide by ID                               |
-| GET    | /guide/id               | singleGuideHandler        | shows specific guide by ID                        |
-| GET    | /user/register          | registerUserFormHandler   | Form to register new users                        |
-| POST   | /user/register          | registerUserHandler       | Create a new user in DB                           |
-| GET    | /user/login             | loginUserFormHandler      | Form for the Login                                |
-| POST   | /user/login             | loginUserHandler          | Authentication + Login                            |
-| POST   | /user/logout            | logoutUserHandler         | Logout                                            |
-| GET    | /user/settings          | settingsUserFormHandler   | Form to change settings                           |
-| POST   | /user/settings          | settingsUserHandler       | Save changed settings                             |
-| GET    | /user/settings/password | settingsUserPwFormHandler | Form to change settings                           |
-| POST   | /user/settings/password | settingsUserPwHandler     | Save changed settings                             |
+| method                          | route                   | handler            | description                            |
+|---------------------------------|-------------------------|--------------------|----------------------------------------|
+| GET                             | /                       | homeSite           | Default landing page                   |
+| GET                             | /allguides              | allGuides          | lists all guides                       |
+| GET                             | /guide/$id              | singleGuide        | list specified Guide                   |
+| GET                             | /user/register          | registerUserForm   | Form for registration                  |
+| POST                            | /user/register          | registerUser       | Creates new User in DB with a wallet   |
+| GET                             | /user/login             | loginUserForm      | Form for login                         |
+| POST                            | /user/login             | loginUserHandler   | Authenticates a user                   |
+| Routes for authenticated users: |                         |                    |                                        |
+| GET                             | /createguide            | createGuideForm    | Form to create a new guide             |
+| POST                            | /createguide            | createGuide        | Creates a new guide in DB              |
+| POST                            | /deleteguide            | deleteGuide        | Deletes a Guide by ID                  |
+| GET                             | /editguide/$id          | editGuideForm      | Form to edit an existing guide by id   |
+| POST                            | /editguide              | editGuide          | Updates guide in DB                    |
+| GET                             | /user/profile           | profileUser        | Display user Profile                   |
+| GET                             | /user/settings          | settingsUserForm   | Form to change user settings           |
+| POST                            | /user/settings          | settingUser        | Update edited user settings in DB      |
+| GET                             | /user/settings/password | settingsUserPwForm | Form to change user password           |
+| POST                            | /user/settings/password | settingsUserPw     | Update edited user password in DB      |
+| POST                            | /user/logout            | logoutUser         | Logs user out by invalidating session  |
+| POST                            | /allguides              | upvoteAllGuides    | Upvotes a Guide from allguides page    |
+| POST                            | /guide/$id              | upvoteSingleGuide  | Upvotes a Guide at specific guide page |
+
+--> Rethink about upvote-handlers - I currently use 2 bc. it's more readable and cleaner flow, however 1 could also be use similar to the delete-function...
 
 ### More on lnurl-auth
 - [fiatjaf blog:](https://fiatjaf.com/e0a35204.html)
 - [lnurl-auth explained github:](https://github.com/fiatjaf/lnurl-rfc/blob/legacy/lnurl-auth.md)
 - [lnurl-auth expample implementation in go:](https://github.com/xplorfin/lnurlauth)
+
+### Thougth's and Questions...
+- LNbits Keys also unique entrys in DB? (+check serverside?)
+- Use less precise DB queries eg. Pull whole Guide instead just guides.UserId ?
+  - This would result in less Queries(code) but we also pull always way more Data than needed
+
 
 

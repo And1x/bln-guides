@@ -14,8 +14,6 @@ type Form struct {
 	Errors errors
 }
 
-// todo: Rewrite error field with better messages
-
 // New initialzes a new Form struct with specific data as param
 func New(data url.Values) *Form {
 	return &Form{
@@ -29,7 +27,7 @@ func (f *Form) Required(fields ...string) {
 	for _, field := range fields {
 		value := f.Get(field)
 		if strings.TrimSpace(value) == "" {
-			f.Errors.Add(field, "This field cannot be blank!")
+			f.Errors.Add(field, "Required field! Please enter something!")
 		}
 	}
 }
@@ -39,11 +37,11 @@ func (f *Form) IsPositiveNumber(field string) {
 	value := f.Get(field)
 	valueInt, err := strconv.Atoi(value)
 	if err != nil {
-		f.Errors.Add(field, "This field got not a number")
+		f.Errors.Add(field, "Please enter a number > 0!")
 		return
 	}
 	if valueInt <= 0 {
-		f.Errors.Add(field, "This field needs number > 0")
+		f.Errors.Add(field, "Please enter a number > 0!")
 		return
 	}
 }
@@ -55,7 +53,7 @@ func (f *Form) MaxLength(field string, max int) {
 		return
 	}
 	if utf8.RuneCountInString(value) > max {
-		f.Errors.Add(field, fmt.Sprintf("This field is too long (max. %d chars)", max))
+		f.Errors.Add(field, fmt.Sprintf("Too long! Please enter soemthing < %d chars!", max))
 	}
 }
 
@@ -66,7 +64,7 @@ func (f *Form) MinLength(field string, min int) {
 		return
 	}
 	if utf8.RuneCountInString(value) < min {
-		f.Errors.Add(field, fmt.Sprintf("This field is too shor (min. %d chars)", min))
+		f.Errors.Add(field, fmt.Sprintf("Too short! Please enter something > %d chars!", min))
 	}
 }
 
@@ -77,7 +75,7 @@ func (f *Form) ValidMail(fields ...string) {
 
 		_, err := mail.ParseAddress(value)
 		if err != nil {
-			f.Errors.Add(field, "This Address is not valid")
+			f.Errors.Add(field, "Invalid! Please enter a valid address format!")
 		}
 	}
 }

@@ -44,7 +44,7 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 	return mg, nil
 }
 
-// GetUidByID gets the User_ID of the guide // todo: rename function
+// GetUidByID gets the User_ID of the guide
 func (g *GuidesModel) GetUidByID(id int) (int, error) {
 
 	stmt := `SELECT user_id FROM guides WHERE id = $1`
@@ -65,7 +65,9 @@ func (g *GuidesModel) GetUidByID(id int) (int, error) {
 
 func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid FROM guides`
+	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid 
+			FROM guides
+			ORDER BY id ASC`
 
 	rows, err := g.DB.Query(stmt)
 	if err != nil {
@@ -137,7 +139,6 @@ func (g *GuidesModel) UpdateById(id int, title, content string) error {
 
 	_, err := g.DB.Exec(stmt, title, content, time.Now(), id)
 	if err != nil {
-		log.Println(err) // todo: infolog - or just return err and log later..
 		return err
 	}
 	return nil
@@ -151,7 +152,6 @@ func (g *GuidesModel) AddToUpvotes(id, amount int) error {
 
 	_, err := g.DB.Exec(stmt, amount, id)
 	if err != nil {
-		log.Println(err) // todo: infolog - or just return err and log later..
 		return err
 	}
 	return nil
@@ -166,7 +166,6 @@ func (g *GuidesModel) AddToUpvoteUserCount(id, payerUid int) error {
 
 	_, err := g.DB.Exec(stmt, payerUid, id)
 	if err != nil {
-		log.Println(err) // todo: infolog - or just return err and log later..
 		return err
 	}
 	return nil

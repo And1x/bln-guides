@@ -36,7 +36,6 @@ func (u *UserModel) New(name, password, lnaddr, email string) error {
 		// check : https://github.com/lib/pq/blob/master/error.go
 		// pq Code -> "23505": "unique_violation"
 
-		// todo: check for lnb values as unique too??
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code.Name() == "unique_violation" { // true when a pq.Error is there which contains "unique_violation"
 			switch {
 			case strings.Contains(pqErr.Message, "name_unique"):
@@ -109,14 +108,13 @@ func (u *UserModel) UpdatePwByUid(id int, password string) error {
 	return err
 }
 
-// GetById returns all User Information // todo: Pull less UserInformation - just as much as needed for the task
+// GetById returns all User Information
 func (m *UserModel) GetById(id int) (*models.User, error) {
 
-	if id < 1 { // todo: just check 0 better?
+	if id < 1 {
 		return nil, errors.New("ivalid UserID")
 	}
 
-	// todo: added lnbits stuff here and at row.Scan()
 	stmt := `SELECT id, name, password, lnaddress, email, created, lnb_uid, lnb_adminkey, lnb_invoicekey, upvote
 	 FROM users WHERE id = $1`
 
@@ -134,10 +132,10 @@ func (m *UserModel) GetById(id int) (*models.User, error) {
 	return mu, nil
 }
 
-// GetInvoiceKey // todo: this way or just pull complete UserData from DB - see. GetById
+// GetInvoiceKey
 func (m *UserModel) GetInvoiceKey(id int) (string, error) {
 
-	if id < 1 { // todo: just check 0 better?
+	if id < 1 {
 		return "", errors.New("ivalid UserID")
 	}
 
@@ -157,10 +155,10 @@ func (m *UserModel) GetInvoiceKey(id int) (string, error) {
 	return ik, nil
 }
 
-// GetInvoiceKey // todo: this way or just pull complete UserData from DB - see. GetById
+// GetAdminKeyAndUpvoteAmount
 func (m *UserModel) GetAdminKeyAndUpvoteAmount(id int) (string, int, error) {
 
-	if id < 1 { // todo: just check 0 better?
+	if id < 1 {
 		return "", 0, errors.New("ivalid UserID")
 	}
 
@@ -180,29 +178,6 @@ func (m *UserModel) GetAdminKeyAndUpvoteAmount(id int) (string, int, error) {
 
 	return ak, up, nil
 }
-
-// // GetUpvoteAmount // todo: this way or just pull complete UserData from DB - see. GetById
-// func (m *UserModel) GetUpvoteAmount(id int) (int, error) {
-
-// 	if id < 1 { // todo: just check 0 better?
-// 		return 0, errors.New("ivalid UserID")
-// 	}
-
-// 	stmt := `SELECT upvote FROM users WHERE id = $1`
-
-// 	row := m.DB.QueryRow(stmt, id)
-
-// 	var amount int
-
-// 	err := row.Scan(&amount)
-// 	if err == sql.ErrNoRows {
-// 		return 0, sql.ErrNoRows
-// 	} else if err != nil {
-// 		return 0, err
-// 	}
-
-// 	return amount, nil
-// }
 
 // Authenticate checks if user-name is in DB, compares password-hashes
 // returns UserID if successful

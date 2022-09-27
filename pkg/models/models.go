@@ -21,7 +21,7 @@ type Guide struct {
 	Created      time.Time
 	Updated      time.Time
 	UpvoteAmount int
-	UpvoteUsers  int //[]sql.NullInt16 // todo: change type to just int and convert in sql function GetById and GetAll...
+	UpvoteUsers  int
 }
 
 type User struct {
@@ -34,5 +34,5 @@ type User struct {
 	LNbUID        string
 	LNbAdminKey   string
 	LNbInvoiceKey string
-	Upvote        string // todo: int more appropriate but form.Values returns always strings..
+	Upvote        string // todo: int more appropriate but form.Values returns always so it's simpler this way..
 }

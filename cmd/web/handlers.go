@@ -57,18 +57,17 @@ func (app *app) editGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
-		app.clientError(w, http.StatusNotFound)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
 	// not authorized user trys to edit other users guide/ or guide doesn't exists
-	// todo: if guide doesn't exists, still a StatusForbidden response?
 	if !app.isAuthorized(id, w, r) {
 		app.clientError(w, http.StatusForbidden)
 		return
 	}
 
-	gid, err := app.guides.GetById(id, false) // false bc edit in md not html
+	gid, err := app.guides.GetById(id, false)
 	if err == models.ErrNoRows {
 		app.clientError(w, http.StatusNotFound)
 		return
@@ -94,7 +93,7 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.PostFormValue("id"))
 	if err != nil || id < 1 {
-		app.clientError(w, http.StatusNotFound)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -110,7 +109,7 @@ func (app *app) editGuideHandler(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		app.render(w, r, "editguide.page.tmpl", &TemplateData{ // if invalid render with edited values not the ones before
 			Guide: &models.Guide{
-				Id:      id, // todo: ID useful here??
+				Id:      id,
 				Title:   form.Get("title"),
 				Content: template.HTML(form.Get("content")),
 			},
@@ -147,7 +146,7 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 	if r.FormValue("delete") == "Delete" {
 		id, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil || id < 1 {
-			app.clientError(w, http.StatusNotFound)
+			app.clientError(w, http.StatusBadRequest)
 			return
 		}
 
@@ -178,7 +177,7 @@ func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
-		app.clientError(w, http.StatusNotFound)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -307,15 +306,20 @@ func (app *app) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/createguide", http.StatusSeeOther)
 }
 
+// Thougts to upvotAllGuides & upvoteSingleGuide Handlers:
+// Using guide_id and user_id?
+// In case the user_Id gets tampered while upvoting
+// the guide receives an upvote but the author of it doesn't receive sats
+// addidtional DB query needed to get User_id from guide_id
+// models.Guides contains both user/guide-id but user could be tamperd
+// hence it's just a hidden field...
+// ---> For now I'll stick with guide ID and do the additional DB Query
+
 // upvoteAllGuidesHandler handles the upvote of guides
 func (app *app) upvoteAllGuidesHandler(w http.ResponseWriter, r *http.Request) {
 
-	// step2: get GuideID
 	gid := r.FormValue("gid")
-
-	// step3: call upvote function
 	err := app.upvoteGuide(r, gid)
-
 	if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
 		app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
 		app.allGuidesHandler(w, r)
@@ -324,7 +328,6 @@ func (app *app) upvoteAllGuidesHandler(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	} else {
-		// step4: render route we got from step1
 		app.allGuidesHandler(w, r) // todo: is this good practice or render again??
 	}
 }
@@ -346,66 +349,11 @@ func (app *app) upvoteSingleGuideHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-// Using guide_id and user_id?
-// In case the user_Id gets tampered while upvoting
-// the guide receives an upvote but the author of it doesn't receive sats
-// addidtional DB query needed to get User_id from guide_id
-// models.Guides contains both user/guide-id but user could be tamperd
-// hence it's just a hidden field...
-// ---> For now I'll stick with guide ID and do the additional DB Query
-
-// upvoteGuideHandler gives an upvote in sats to the author of the guide
-// func (app *app) upvoteGuideHandler(w http.ResponseWriter, r *http.Request) {
-
-// 	// step1: check if user comes from single-guide or all-guide route
-// 	if r.URL.String() == "/allguides" {
-// 		gid := r.FormValue("gid")
-
-// 		// step3: call upvote function
-// 		err := app.upvoteGuide(r, gid)
-
-// 		if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
-// 			app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
-// 			//app.allGuidesHandler(w, r)
-// 			app.allGuidesHandler(w, r)
-// 			return
-// 		} else if err != nil {
-// 			app.serverError(w, err)
-// 			return
-// 		} else {
-// 			// step4: render route we got from step1
-// 			// app.allGuidesHandler(w, r) // todo: is this good practice or render again??
-// 			app.allGuidesHandler(w, r)
-// 		}
-
-// 	} else if strings.Contains(r.URL.String(), "/singleguide") {
-// 		gid := chi.URLParam(r, "id")
-
-// 		// step3: call upvote function
-// 		err := app.upvoteGuide(r, gid)
-
-// 		if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
-// 			app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
-// 			//app.allGuidesHandler(w, r)
-// 			http.Redirect(w, r, fmt.Sprintf("/guide/%s", gid), http.StatusOK) // todo: Statusok good?
-// 			return
-// 		} else if err != nil {
-// 			app.serverError(w, err)
-// 			return
-// 		} else {
-// 			// step4: render route we got from step1
-// 			// app.allGuidesHandler(w, r) // todo: is this good practice or render again??
-// 			http.Redirect(w, r, fmt.Sprintf("/guide/%s", gid), http.StatusOK) // todo: Statusok good?
-// 		}
-
-// 	}
-// }
-
 // profile Handler shows Balance and Nav to Settings/Password change
-func (app *app) profileHandler(w http.ResponseWriter, r *http.Request) {
+func (app *app) profileUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get invoiceKey from DB to call LnbitsAPI to get Balance
-	loggedinUserId := app.session.GetInt(r, "userID") // todo: 1: see def:
+	loggedinUserId := app.session.GetInt(r, "userID")
 
 	// if GetInvoiceKey or GetBalance fails -> show Balance currently not available but still render profile Page
 	ikey, err := app.users.GetInvoiceKey(loggedinUserId)
@@ -436,7 +384,7 @@ func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) 
 
 	loggedinUserId := app.session.GetInt(r, "userID") // todo: 1:def: better with authentiction from dB like PW check instead take it from session
 	if loggedinUserId <= 0 {
-		app.clientError(w, http.StatusForbidden) // todo: StatusForbidden appropriate?
+		app.clientError(w, http.StatusForbidden)
 		return
 	}
 
@@ -532,7 +480,7 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate - check old password and name to authenticate and get UserID
 	uid, err := app.users.Authenticate(app.getUserName(r), form.Get("oldPassword"))
 	if err == models.ErrInvalidCredentials {
-		form.Errors.Add("oldPassword", "Password is incorrect") // todo: what if session name got tampered?
+		form.Errors.Add("oldPassword", "Password is incorrect")
 		app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: form})
 		return
 	} else if err != nil {
@@ -564,7 +512,8 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	app.session.Remove(r, "userID") // todo remove userName aswell
+	app.session.Remove(r, "userID")
+	app.session.Remove(r, "userName")
 	app.session.Put(r, "flashMsg", "Successfully logged out!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
