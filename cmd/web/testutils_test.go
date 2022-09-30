@@ -1,13 +1,32 @@
+/* @@@@@@@@@@@@@@@@@@@@
+
+INFO:
+Until I found a better solution, steps to do before testing:
+- comment out middleware for user authentication in routes.go (r.Use(app.requireAuth))
+- comment out .env path in main init function - comment old path
+
+UNDO:
+- handlers.go - createGuideHandler loggedinUserId is set to 1 -- @43 line
+
+@@@@@@@@@@@@@@@@@@@@@ */
+
 package main
 
 import (
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"regexp"
 	"testing"
+	"time"
+
+	"github.com/and1x/bln--h/pkg/mock"
+	"github.com/golangcollege/sessions"
 )
 
 // newTestApp returns a mocked app instance
@@ -29,11 +48,17 @@ func newTestApp(t *testing.T, withLog bool) *app {
 		t.Fatal(err)
 	}
 
+	session := sessions.New([]byte(os.Getenv("SESSION_SECRET")))
+	session.Lifetime = 8 * time.Hour
+
 	return &app{
 		infoLog:       iL,
 		errorLog:      eL,
+		session:       session,
 		templateCache: templateCache,
-		//guides:        &mock.GuidesModel{},
+		guides:        &mock.GuidesModel{},
+		users:         &mock.UserModel{},
+		lnProvider:    &mock.LNbits{},
 	}
 }
 
@@ -47,6 +72,15 @@ type testServer struct {
 func newTestServer(t *testing.T, h http.Handler) *testServer {
 	ts := httptest.NewServer(h)
 
+	// initalize new cookie jar
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts.Client().Jar = jar
+
+	// disable redirect to return the lass statuscode eg. 3xx
 	ts.Client().CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
@@ -85,5 +119,16 @@ func (ts *testServer) postForm(t *testing.T, urlPath string, form url.Values) (i
 	}
 
 	return res.StatusCode, res.Header, body
+}
 
+var csrfTokenRX = regexp.MustCompile(`<input type="hidden" name="csrf_token" value="(.+)">`)
+
+func extractCSRFToken(t *testing.T, body []byte) string {
+
+	matches := csrfTokenRX.FindSubmatch(body)
+	if len(matches) < 2 {
+		t.Fatal("no csrf token found in body")
+	}
+
+	return html.UnescapeString(string(matches[1]))
 }

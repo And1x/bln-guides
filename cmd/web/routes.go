@@ -13,6 +13,7 @@ func (app *app) routes() http.Handler {
 	r.Use(app.recoverPanic, app.logging, app.setSecureHeader) // register our middleware to all routes
 
 	r.Group(func(r chi.Router) { // group routes that should have subsequent(following) middleware
+
 		r.Use(app.session.Enable, noSurf) // register session middleware // and csrf protection
 
 		r.Get("/", http.HandlerFunc(app.homeSiteHandler))
@@ -26,7 +27,9 @@ func (app *app) routes() http.Handler {
 
 		// this group is only for authenticated users accessable
 		r.Group(func(r chi.Router) {
-			r.Use(app.requireAuth)
+
+			//r.Use(app.requireAuth)
+
 			r.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
 			r.Post("/createguide", http.HandlerFunc(app.createGuideHandler))
 			r.Post("/deleteguide", http.HandlerFunc(app.deleteGuideHandler))

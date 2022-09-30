@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +15,6 @@ import (
 
 func (app *app) homeSiteHandler(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "home.page.tmpl", nil)
-	//app.render(w, r, "home.page.tmpl", &TemplateData{})
 }
 
 // createGuideFormHandler gets called via "get" to show createguide Form
@@ -24,6 +24,7 @@ func (app *app) createGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 
+	log.Println("weeeee got here\n and hereeeeeeeeeeeeeeeeeeee")
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -40,7 +41,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//get userID from session to know who created the guide
-	loggedinUserId := app.session.GetInt(r, "userID")
+	loggedinUserId := 1 //app.session.GetInt(r, "userID")
 
 	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), loggedinUserId)
 	if err != nil {

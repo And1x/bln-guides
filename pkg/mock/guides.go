@@ -10,12 +10,14 @@ import (
 type GuidesModel struct{}
 
 var mockGuide = &models.Guide{
-	Id:      21,
-	Title:   "Cant stop, wont stop!",
-	Content: "Cant rest, cant rest, wont rest, beliving in the proccess - every days a progress - slow steps, start to love coding - ah yes",
-	UserID:  1,
-	Created: time.Now(),
-	Updated: time.Now(),
+	Id:           21,
+	Title:        "Cant stop, wont stop!",
+	Content:      "Cant rest, cant rest, wont rest, beliving in the proccess - every days a progress - slow steps...",
+	UserID:       1,
+	Created:      time.Now(),
+	Updated:      time.Now(),
+	UpvoteAmount: 155,
+	UpvoteUsers:  7,
 }
 
 // GetById mocked - default error is no rows can be found -
@@ -26,6 +28,10 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 	} else {
 		return nil, models.ErrNoRows //sql.ErrNoRows
 	}
+}
+
+func (g *GuidesModel) GetUidByID(id int) (int, error) {
+	return 8, nil
 }
 
 // Just a mock of the default behaviour
@@ -46,5 +52,13 @@ func (g *GuidesModel) DeleteById(id int) error {
 }
 
 func (g *GuidesModel) UpdateById(id int, title, content string) error {
+	return nil
+}
+
+func (g *GuidesModel) AddToUpvotes(id, amount int) error {
+	return nil
+}
+
+func (g *GuidesModel) AddToUpvoteUserCount(id, payerUid int) error {
 	return nil
 }
