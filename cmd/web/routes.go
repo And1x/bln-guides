@@ -14,7 +14,7 @@ func (app *app) routes() http.Handler {
 
 	r.Group(func(r chi.Router) { // group routes that should have subsequent(following) middleware
 
-		r.Use(app.session.Enable, noSurf) // register session middleware // and csrf protection
+		r.Use(app.session.Enable, app.noSurf) // register session middleware // and csrf protection
 
 		r.Get("/", http.HandlerFunc(app.homeSiteHandler))
 		r.Get("/allguides", http.HandlerFunc(app.allGuidesHandler))
@@ -28,7 +28,10 @@ func (app *app) routes() http.Handler {
 		// this group is only for authenticated users accessable
 		r.Group(func(r chi.Router) {
 
-			//r.Use(app.requireAuth)
+			// Authentication active in Production, not while testing
+			if app.inProduction {
+				r.Use(app.requireAuth)
+			}
 
 			r.Get("/createguide", http.HandlerFunc(app.createGuideFormHandler))
 			r.Post("/createguide", http.HandlerFunc(app.createGuideHandler))

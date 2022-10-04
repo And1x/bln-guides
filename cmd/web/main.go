@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/and1x/bln--h/pkg/lnbits"
@@ -27,13 +28,6 @@ func init() {
 
 		}
 	}
-
-	// todo: need to switch to this path totest -> improve..
-	// see: https://github.com/joho/godotenv/issues/43
-	// if err := godotenv.Load("./../../.env"); err != nil {
-
-	// 	log.Print(".env File missing")
-	// }
 }
 
 type app struct {
@@ -41,6 +35,7 @@ type app struct {
 	errorLog      *log.Logger
 	session       *sessions.Session
 	templateCache map[string]*template.Template
+	inProduction  bool
 	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetUidByID(id int) (int, error)
@@ -101,6 +96,13 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// inProduction is used to make testing easier/cleaner- e.g skip session, auth ...
+	getInProduction := os.Getenv("inProduction")
+	inProduction, err := strconv.ParseBool(getInProduction)
+	if err != nil {
+		inProduction = true
+	}
+
 	// LNbits API cofig // todo: other way to inject config??
 	lnbitsConf := map[string]string{
 		"host":        os.Getenv("lnb_host"),
@@ -117,6 +119,7 @@ func main() {
 		errorLog:      errorLog,
 		session:       session,
 		templateCache: templateCache,
+		inProduction:  inProduction,
 		guides:        &postgres.GuidesModel{DB: db},
 		users:         &postgres.UserModel{DB: db},
 		lnProvider:    &lnbits.LNbits{Conf: lnbitsConf},

@@ -31,7 +31,10 @@ func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 }
 
 func (g *GuidesModel) GetUidByID(id int) (int, error) {
-	return 8, nil
+	if id == 21 {
+		return 1, nil
+	}
+	return 0, models.ErrNoRows
 }
 
 // Just a mock of the default behaviour
@@ -52,7 +55,10 @@ func (g *GuidesModel) DeleteById(id int) error {
 }
 
 func (g *GuidesModel) UpdateById(id int, title, content string) error {
-	return nil
+	if id == 21 {
+		return nil
+	}
+	return models.ErrNoRows
 }
 
 func (g *GuidesModel) AddToUpvotes(id, amount int) error {

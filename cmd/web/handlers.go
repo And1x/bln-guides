@@ -24,7 +24,6 @@ func (app *app) createGuideFormHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("weeeee got here\n and hereeeeeeeeeeeeeeeeeeee")
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -34,6 +33,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 	form.Required("title", "content")
 	form.MaxLength("title", 80)
+	// form.MinLength("title", 5)
 
 	if !form.Valid() {
 		app.render(w, r, "createguide.page.tmpl", &TemplateData{Form: form})
@@ -41,7 +41,7 @@ func (app *app) createGuideHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//get userID from session to know who created the guide
-	loggedinUserId := 1 //app.session.GetInt(r, "userID")
+	loggedinUserId := app.session.GetInt(r, "userID")
 
 	id, err := app.guides.Insert(form.Get("title"), form.Get("content"), loggedinUserId)
 	if err != nil {
@@ -177,6 +177,7 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	log.Println("..........................", id)
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -354,7 +355,7 @@ func (app *app) upvoteSingleGuideHandler(w http.ResponseWriter, r *http.Request)
 func (app *app) profileUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get invoiceKey from DB to call LnbitsAPI to get Balance
-	loggedinUserId := app.session.GetInt(r, "userID")
+	loggedinUserId := app.authUserId(r)
 
 	// if GetInvoiceKey or GetBalance fails -> show Balance currently not available but still render profile Page
 	ikey, err := app.users.GetInvoiceKey(loggedinUserId)
@@ -383,7 +384,8 @@ func (app *app) profileUserHandler(w http.ResponseWriter, r *http.Request) {
 // settingsUserFormHandler shows the Settings Page for the User
 func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) {
 
-	loggedinUserId := app.session.GetInt(r, "userID") // todo: 1:def: better with authentiction from dB like PW check instead take it from session
+	loggedinUserId := app.authUserId(r) // todo: 1:def: better with authentiction from dB like PW check instead take it from session
+	// loggedinUserId := app.session.GetInt(r, "userID") // todo: 1:def: better with authentiction from dB like PW check instead take it from session
 	if loggedinUserId <= 0 {
 		app.clientError(w, http.StatusForbidden)
 		return
@@ -480,6 +482,7 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authenticate - check old password and name to authenticate and get UserID
 	uid, err := app.users.Authenticate(app.getUserName(r), form.Get("oldPassword"))
+
 	if err == models.ErrInvalidCredentials {
 		form.Errors.Add("oldPassword", "Password is incorrect")
 		app.render(w, r, "usersetpw.page.tmpl", &TemplateData{Form: form})
@@ -507,7 +510,6 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 	app.session.Put(r, "flashMsg", "Password changed.")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-
 }
 
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore

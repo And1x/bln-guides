@@ -50,14 +50,15 @@ func (app *app) requireAuth(next http.Handler) http.Handler {
 	})
 }
 
-func noSurf(next http.Handler) http.Handler {
-	csrfHandler := nosurf.New(next)
+// NoSurf adds CSRF protection to all POST requests
+func (app *app) noSurf(next http.Handler) http.Handler {
+	crsfHandler := nosurf.New(next)
 
-	csrfHandler.SetBaseCookie(http.Cookie{
+	crsfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   true,
+		Secure:   app.inProduction,
+		SameSite: http.SameSiteLaxMode,
 	})
-
-	return csrfHandler
+	return crsfHandler
 }

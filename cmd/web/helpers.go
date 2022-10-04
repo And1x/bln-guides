@@ -21,17 +21,30 @@ func (app *app) clientError(w http.ResponseWriter, status int) {
 
 // authUserId returns userID form the user session
 func (app *app) authUserId(r *http.Request) int {
+	// todo: it's there to test
+	if !app.inProduction {
+		return 1
+	}
 	return app.session.GetInt(r, "userID")
 }
 
 // getUserName return userName from the user session
 func (app *app) getUserName(r *http.Request) string {
+	// todo: it's there to test
+	if !app.inProduction {
+		return "Satu Naku"
+	}
 	return app.session.GetString(r, "userName")
 }
 
 // isAuthorized checks if the users session ID fits to the guide.UserId he wants to edit/delete
 // and POST request(form) - seems more cumbersome than just use it in handlers
 func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request) bool {
+
+	// todo: always return true while testing?
+	if !app.inProduction {
+		return true
+	}
 
 	guide, err := app.guides.GetById(guideId, false)
 	if err != nil {
@@ -53,10 +66,10 @@ func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 
 	// get InvoiceKey from author of the guide
 	gid, err := strconv.Atoi(guideId)
-
 	if err != nil {
 		return err
 	}
+
 	// query DB to get authors user_Id from guide_id
 	uid, err := app.guides.GetUidByID(gid)
 	if err != nil {
