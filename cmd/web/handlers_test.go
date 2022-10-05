@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
@@ -351,7 +350,6 @@ func TestLoginUserHandler(t *testing.T) {
 			form.Add("csrf_token", csrfToken)
 
 			resCode, _, body := ts.postForm(t, "/user/login", form)
-			fmt.Println(string(body))
 
 			if resCode != test.wantResCode {
 				t.Errorf("want %d but got %d", test.wantResCode, resCode)

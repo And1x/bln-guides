@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -177,7 +176,6 @@ func (app *app) deleteGuideHandler(w http.ResponseWriter, r *http.Request) {
 func (app *app) singleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-	log.Println("..........................", id)
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusBadRequest)
 		return

@@ -38,7 +38,6 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-
 }
 
 a {
@@ -117,9 +116,11 @@ a {
     text-decoration-line: underline;
 }
 
-ul {
+.fullguide ul{
     background-color: var(--bg-color2);
 }
+
+
 
 /* || Footer */
 .footer {
@@ -154,12 +155,11 @@ label {
     font-size: 1.5em;
 }
 
+/* todo: specify only inputs needed */
 input {
-    width: 60%;
+    /* width: 60%; */
 
-    height: 1.5em;
-    /* margin-top: 2px;
-    margin-bottom: 2px; */
+    /* height: 1.5em; */
 }
 
 .container {
@@ -178,4 +178,11 @@ input {
 
 .mb5 {
     margin-bottom: 1em;
+}
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
 }
