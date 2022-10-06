@@ -22,6 +22,8 @@ type Guide struct {
 	Updated      time.Time
 	UpvoteAmount int
 	UpvoteUsers  int
+	UserName     string // get with join (guides + users) by UID
+	UserLNaddr   string // get with join (guides + users) by UID
 }
 
 type User struct {

@@ -2,19 +2,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {{/* <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> */}}
-    {{with .Guide}}
-            {{/* <meta name="lightning" content="lnurlp:{{.Author}}"/> */}}
-            <meta name="lightning" content="lnurlp:And1@stacker.news"/>
-            <meta property="og:image" content="/static/img/&1.png">
-    {{else}}
-        <meta name="lightning" content="lnurlp:And1@stacker.news"/>
-        <meta property="og:image" content="/static/img/&1.png">
-    {{end}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
+    {{/* webln only on singleguides used rn*/}}
+    {{template "webln" .}}
 
      <link id="cssstyle" rel="stylesheet" href="/static/css/style.css"> 
     {{/* <link rel="stylesheet" href="/static/css/sys-dark-light.css"> Use sys settings for light/dark mode*/}}

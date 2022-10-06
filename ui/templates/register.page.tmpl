@@ -1,5 +1,5 @@
 {{template "base" .}}
-
+{{define "webln"}}{{end}}
 {{define "title"}}Register{{end}}
 
 {{define "body"}}
@@ -12,14 +12,14 @@
                 {{with .Errors.Get "name"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input type="text" id="name" name="name" value='{{.Get "name"}}'>
+                <input class="inputfield" type="text" id="name" name="name" value='{{.Get "name"}}'>
             </div>
             <div>
                 <label for="pw" >Password:</label>
                 {{with .Errors.Get "password"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input type="password" id ="pw" name="password">
+                <input class="inputfield" type="password" id ="pw" name="password">
             </div><br>
             <div>Not required*</div>
             <div>
@@ -27,19 +27,18 @@
                 {{with .Errors.Get "lnaddr"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input type="text" id="lnaddr" name="lnaddr" value='{{.Get "lnaddr"}}'>
+                <input class="inputfield" type="text" id="lnaddr" name="lnaddr" value='{{.Get "lnaddr"}}'>
             </div>
             <div>
                 <label for="email" >Email:</label>
                 {{with .Errors.Get "email"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input type="text" id="email" name="email" value='{{.Get "email"}}'>
+                <input class="inputfield" type="text" id="email" name="email" value='{{.Get "email"}}'>
             </div>
 
             <div>
-                {{/* <input type="submit" value="Register"> */}}
-                <button type="submit" name="register" value="Register">Register</button>
+                <button class="button" type="submit" name="register" value="Register">Register</button>
             </div>
 
             <div>

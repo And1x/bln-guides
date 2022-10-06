@@ -20,14 +20,23 @@ type GuidesModel struct {
 // GetById returns a Guide by ID - if inHtml==true then convertes content from md to Html
 func (g *GuidesModel) GetById(id int, inHtml bool) (*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid FROM guides WHERE id = $1`
+	// stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid
+	// 		FROM guides
+	// 		WHERE id = $1`
+
+	// Join stmt to get userName and userLnaddr to guides as well
+	stmt := `SELECT guides.id, guides.title, guides.content, guides.created, guides.updated, 
+			guides.up_total, guides.ups_by_uid, guides.user_id, users.name, users.lnaddress 
+			FROM guides, users 
+			WHERE guides.user_id = users.id
+			AND guides.id = $1`
 
 	row := g.DB.QueryRow(stmt, id)
 
 	mg := &models.Guide{}
 	upvotesByUid := []sql.NullInt16{} // used for conversion of psql array field
 
-	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid))
+	err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid), &mg.UserID, &mg.UserName, &mg.UserLNaddr)
 	//err := row.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&mg.UpvoteUsers))
 	if err == sql.ErrNoRows {
 		return nil, sql.ErrNoRows
@@ -65,8 +74,15 @@ func (g *GuidesModel) GetUidByID(id int) (int, error) {
 
 func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 
-	stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid 
-			FROM guides
+	// stmt := `SELECT id, title, content, user_id, created, updated, up_total, ups_by_uid
+	// 		FROM guides
+	// 		ORDER BY id ASC`
+
+	// Join stmt to get userName and userLnaddr to guides as well
+	stmt := `SELECT guides.id, guides.title, guides.content, guides.created, guides.updated, 
+			guides.up_total, guides.ups_by_uid, guides.user_id, users.name, users.lnaddress 
+			FROM guides, users 
+			WHERE guides.user_id = users.id
 			ORDER BY id ASC`
 
 	rows, err := g.DB.Query(stmt)
@@ -81,7 +97,8 @@ func (g *GuidesModel) GetAll() ([]*models.Guide, error) {
 		mg := &models.Guide{}
 		upvotesByUid := []sql.NullInt16{}
 
-		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid))
+		//err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.UserID, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid))
+		err := rows.Scan(&mg.Id, &mg.Title, &mg.Content, &mg.Created, &mg.Updated, &mg.UpvoteAmount, pq.Array(&upvotesByUid), &mg.UserID, &mg.UserName, &mg.UserLNaddr)
 		if err != nil {
 			return nil, err
 		}

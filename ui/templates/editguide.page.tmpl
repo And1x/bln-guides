@@ -1,5 +1,5 @@
 {{template "base" .}}
-
+{{define "webln"}}{{end}}
 {{define "title"}}Edit Guide{{end}}
 
 {{define "body"}}
@@ -11,15 +11,15 @@
             {{with .Errors.Get "title"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input type="text" name="title" id="title" value="{{$.Guide.Title}}">
+            <input class="inputfield" type="text" name="title" id="title" value="{{$.Guide.Title}}">
             <label for="content">Content:</label>
             {{with .Errors.Get "content"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <textarea name="content" id="content" cols="80" rows="10">{{$.Guide.Content}}</textarea>
+            <textarea class="inputfield" name="content" id="content" cols="80" rows="10">{{$.Guide.Content}}</textarea>
         
             <input type="hidden" name="id" value="{{$.Guide.Id}}">
-            <button type="submit" name="submitEdit" value="Save">Save</button>
+            <button class="button" type="submit" name="submitEdit" value="Save">Save</button>
         {{end}}
     </form>
 </div>

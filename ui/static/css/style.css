@@ -44,7 +44,9 @@ a {
     color: var(--font-color);
 }
 /* todo: add a:hover effect and maybe a:after tooo */
-
+a:hover {
+    background-color: orange;
+}
 
 .button {
     background-color: transparent;
@@ -140,26 +142,25 @@ a {
     background-color: transparent;
 }
 
-/* .fullscreen-icon {
-    width: 30px;
-    border: none;
-}
-
-.fullscreen-icon:hover {
-    background-color: transparent;
-} */
-
 /* || Input Fields */
 label {
     display: block;
     font-size: 1.5em;
 }
 
-/* todo: specify only inputs needed */
-input {
-    /* width: 60%; */
+.inputfield{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 3px;
+  box-sizing: border-box;
+  border: 3px solid #ccc;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+}
 
-    /* height: 1.5em; */
+.inputfield:focus{
+  border: 3px solid orange;
 }
 
 .container {

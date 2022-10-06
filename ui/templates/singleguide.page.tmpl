@@ -1,5 +1,19 @@
 {{template "base" .}}
 
+{{define "webln"}}
+    {{with .Guide}}
+        {{/*In case User still has default LNaddress(no real) it gets changed to and1@getalby.com*/}}
+        {{$defaultLNaddr := print .UserName "@example.com"}}
+        {{if eq $defaultLNaddr .UserLNaddr}}
+            <meta name="lightning" content="lnurlp:and1@getalby.com"/>
+            <meta property="og:image" content="/static/img/btc.svg">
+        {{else}}
+            <meta name="lightning" content="lnurlp:{{.UserLNaddr}}"/>
+            <meta property="og:image" content="/static/img/btc.svg">
+        {{end}}
+    {{end}}
+{{end}}
+
 {{define "title"}}View Guide{{end}}
 {{define "body"}}
 
@@ -33,7 +47,7 @@
     {{.Content}} 
 
 <div class="guide-footer">
-    {{/* By: {{.Author}} <br> */}}
+    By: {{.UserName}} <br>
     Created: {{humandate .Created}} <br>
     {{if ne .Created .Updated}}
         Updated: {{humandate .Updated}} <br>

@@ -1,5 +1,5 @@
 {{template "base" .}}
-
+{{define "webln"}}{{end}}
 {{define "title"}}View Guides{{end}}
 
 {{define "body"}}
@@ -38,7 +38,7 @@
 </div>
     {{.Content}} <br>
 <div class="guide-footer">
-    {{/* By: {{.Author}} <br> */}}
+    By: {{.UserName}} <br> 
     Created: {{humandate .Created}} <br>
     {{if ne .Created .Updated}}
         Updated: {{humandate .Updated}} <br>
