@@ -1,7 +1,7 @@
-# bln--h
+# About bln-guides:
   bln guides is my first real fullstack project to learn and improve my skills in Web development with focus on Go, PostgreSQL and Bitcoin/Lightning. So if you encounter any bugs or have any suggestions for improvement, I would be happy to hear from you.
-
-## About 'bln guides':
+  
+---
 - Write Guides, preferably about Bitcoin or Ligthning and get bitcoin(sats) in form of upvotes. Use Markdown to format your guides. 
 - Registration creates automatically a Wallet within LNbits where your bitcoin balance is managed.
 
