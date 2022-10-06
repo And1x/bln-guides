@@ -1,5 +1,5 @@
 # bln--h
-  bln guides is my first real fullstack project to learn and improve my skills in Web development with a focus on Go and Bitcoin/Lightning. So if you encounter any bugs or have any suggestions for improvement, I would be happy to hear from you.
+  bln guides is my first real fullstack project to learn and improve my skills in Web development with focus on Go, PostgreSQL and Bitcoin/Lightning. So if you encounter any bugs or have any suggestions for improvement, I would be happy to hear from you.
 
 ## About 'bln guides':
 - Write Guides, preferably about Bitcoin or Ligthning and get bitcoin(sats) in form of upvotes. Use Markdown to format your guides. 
@@ -16,7 +16,7 @@
 - Database: Postgresql
 - Wallet Management: LNbits
 
-### Roadmap/ ToDo List:
+## Roadmap/ ToDo List:
 
 - [x] Create DB and Forms to post guides 
 - [x] Add markdown
@@ -25,15 +25,16 @@
 - [x] Add basic Authentication
   - currently username + password
 - [x] Add LNbits 
-  - show balance
-  - send/receive payments in form of upvotes 
+  - [x] show balance
+  - [x] send/receive payments in form of upvotes 
+  - [ ] Deposit/Withdraw in app
 - [ ] Add Unit tests
   - [x] Handlers 
   - [x] middleware
   - [ ] helpers
   - [x] render
 - [x] Day/Night mode based on system settings
-- [ ] Login with LN-Auth
+- [ ] Login with LNURL-Auth
 
 
  # Routes:
@@ -41,8 +42,8 @@
 | method                          | route                   | handler            | description                            |
 |---------------------------------|-------------------------|--------------------|----------------------------------------|
 | GET                             | /                       | homeSite           | Default landing page                   |
-| GET                             | /allguides              | allGuides          | lists all guides                       |
-| GET                             | /guide/{id}             | singleGuide        | list specified Guide                   |
+| GET                             | /allguides              | allGuides          | Lists all guides                       |
+| GET                             | /guide/{id}             | singleGuide        | List specified Guide                   |
 | GET                             | /user/register          | registerUserForm   | Form for registration                  |
 | POST                            | /user/register          | registerUser       | Creates new User in DB with a wallet   |
 | GET                             | /user/login             | loginUserForm      | Form for login                         |

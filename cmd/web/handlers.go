@@ -199,7 +199,7 @@ func (app *app) registerUserFormHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 // registerUserHandler creates a new DB entry with the Users Details
-// in Steps: // todo: better workflow??
+// in Steps: // todo: better workflow?
 // 1. Get User Reg. Form Data
 // 2. Create User in DB with default(unusable) LNbits values
 // 3. Create LNbits wallet/user
@@ -328,14 +328,14 @@ func (app *app) upvoteAllGuidesHandler(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	} else {
-		app.allGuidesHandler(w, r) // todo: is this good practice or render again??
+		app.allGuidesHandler(w, r) // todo: is this good practice or render again?
 	}
 }
 
 // upvoteSingleGuideHandler handles the upvote of a specific guide
 func (app *app) upvoteSingleGuideHandler(w http.ResponseWriter, r *http.Request) {
 
-	gid := chi.URLParam(r, "id") // todo: or get it from form.Value guide.id ?
+	gid := chi.URLParam(r, "id")
 	err := app.upvoteGuide(r, gid)
 	if err != nil && strings.Contains(err.Error(), "Insufficient balance") {
 		app.session.Put(r, "flashMsg", "inssuffiecient balance - please deposit or change upvote amount")
@@ -382,8 +382,7 @@ func (app *app) profileUserHandler(w http.ResponseWriter, r *http.Request) {
 // settingsUserFormHandler shows the Settings Page for the User
 func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) {
 
-	loggedinUserId := app.authUserId(r) // todo: 1:def: better with authentiction from dB like PW check instead take it from session
-	// loggedinUserId := app.session.GetInt(r, "userID") // todo: 1:def: better with authentiction from dB like PW check instead take it from session
+	loggedinUserId := app.authUserId(r) // todo: 1:def: better with authentication from dB like PW check instead take it from session
 	if loggedinUserId <= 0 {
 		app.clientError(w, http.StatusForbidden)
 		return
@@ -399,7 +398,7 @@ func (app *app) settingsUserFormHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	app.render(w, r, "usersetmail.page.tmpl", &TemplateData{
-		User: userData, // todo: could this leak more Data than neccessary? maybe it's better just return needed User fields...
+		User: userData,
 		Form: forms.New(nil),
 	})
 }
@@ -418,7 +417,7 @@ func (app *app) settingsUserHandler(w http.ResponseWriter, r *http.Request) {
 	form.IsPositiveNumber("upvote")
 
 	if !form.Valid() {
-		app.render(w, r, "usersetmail.page.tmpl", &TemplateData{ // todo: instead to render just call settingsUserFormHandler per GET req and add session Flash MSG for Invalid Form?
+		app.render(w, r, "usersetmail.page.tmpl", &TemplateData{
 			User: &models.User{
 				LNaddr: form.Get("lnaddr"),
 				Email:  form.Get("email"),

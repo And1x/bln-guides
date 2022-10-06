@@ -75,7 +75,7 @@ func (u *UserModel) GetAdminKeyAndUpvoteAmount(id int) (string, int, error) {
 	}
 }
 
-// todo: hash of pw used -- better use bcrypt to compare pw with hash??
+// note: clear password is used here
 func (u *UserModel) Authenticate(name, password string) (int, error) {
 	if name == "Satu Naku" && password == "oldpassword" {
 		return 7, nil

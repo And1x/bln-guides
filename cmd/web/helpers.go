@@ -41,14 +41,14 @@ func (app *app) getUserName(r *http.Request) string {
 // and POST request(form) - seems more cumbersome than just use it in handlers
 func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request) bool {
 
-	// todo: always return true while testing?
+	// todo:  it's there to test
 	if !app.inProduction {
 		return true
 	}
 
 	guide, err := app.guides.GetById(guideId, false)
 	if err != nil {
-		app.errorLog.Printf("couldn't get guide from DB: %v", err) //todo: errorhandling in this case?
+		app.errorLog.Printf("couldn't get guide from DB: %v", err)
 		return false
 	}
 
