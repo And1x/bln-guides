@@ -53,6 +53,9 @@ func (app *app) routes() http.Handler {
 			r.Get("/user/deposit", http.HandlerFunc(app.depositFormHandler))
 			r.Post("/user/deposit", http.HandlerFunc(app.depositHandler))
 
+			r.Get("/user/withdraw", http.HandlerFunc(app.withdrawFormHandler))
+			r.Post("/user/withdraw", http.HandlerFunc(app.withdrawHandler))
+
 			r.Post("/user/logout", http.HandlerFunc(app.logoutUserHandler))
 
 		})

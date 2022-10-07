@@ -60,7 +60,7 @@ type app struct {
 		CreateUserWallet(userName string) (string, string, string, error)
 		GetBalance(invoiceKey string) (int, error)
 		CreateInvoice(invoiceKey, message string, amount int) (string, string, error)
-		PayInvoice(paymentRequest, paymentHash, adminKey string) (bool, error)
+		PayInvoice(paymentRequest, adminKey string) (string, error)
 	}
 }
 

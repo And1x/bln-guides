@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -537,8 +538,7 @@ func (app *app) depositHandler(w http.ResponseWriter, r *http.Request) {
 
 	// trigger deposit
 	// create invoice with amount from form
-	uid := app.authUserId(r)
-	ik, err := app.users.GetInvoiceKey(uid)
+	ik, err := app.users.GetInvoiceKey(app.authUserId(r))
 	if err != nil {
 		app.serverError(w, err) // todo: or just render and show message with try later?
 		return
@@ -550,13 +550,42 @@ func (app *app) depositHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// redirect with Payment Request -- todo: session or better use TemplateData?
-	// app.session.Put(r, "flashMsg", "Pay this Request:\n"+payReq)
-	// http.Redirect(w, r, "/user/deposit", http.StatusSeeOther)
-
 	app.render(w, r, "deposit.page.tmpl", &TemplateData{StringMap: map[string]string{"Invoice": payReq}})
-	// todo: give user some feedback when deposit was successful
 
+	// todo: give user some feedback when deposit was successful
+}
+
+func (app *app) withdrawFormHandler(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, "withdraw.page.tmpl", &TemplateData{Form: forms.New(nil)})
+}
+
+func (app *app) withdrawHandler(w http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	// todo: validate invoice before it gets sent to LNbits
+	invoice := r.Form.Get("withdrawInvoice")
+
+	// get adminKey
+	ak, _, err := app.users.GetAdminKeyAndUpvoteAmount(app.authUserId(r))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	_, err = app.lnProvider.PayInvoice(invoice, ak)
+	if err != nil {
+		log.Println(err)
+		//app.serverError(w, err)
+		return
+	}
+
+	app.session.Put(r, "flashMsg", "Withdraw done!")
+	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
 }
 
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore

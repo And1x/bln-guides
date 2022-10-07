@@ -1,0 +1,25 @@
+{{template "base" .}}
+{{define "title"}}Withdraw{{end}}
+
+{{define "body"}}
+<div class="container">
+
+    {{with .StringMap.Balance}} 
+    <div class="mb5">
+        Balance: {{.}}
+    </div>
+    {{end}}
+    <form method="POST" action="/user/withdraw">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        {{with .Form}}
+            <label for="withdraw">Enter Invoice to withdraw:</label>
+            {{with .Errors.Get "withdraw"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input class="inputfield" type="text" name="withdrawInvoice" id="withdrawInvoice">
+            
+            <button class="button" type="submit" name="submitWithdraw" value="withdraw">Pay out</button>
+        {{end}}
+    </form>
+</div>
+{{end}}

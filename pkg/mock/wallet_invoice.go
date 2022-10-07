@@ -14,6 +14,6 @@ func (lnb *LNbits) CreateInvoice(invoiceKey, message string, amount int) (string
 	return "", "", nil
 }
 
-func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (bool, error) {
-	return true, nil
+func (lnb *LNbits) PayInvoice(paymentRequest, adminKey string) (string, error) {
+	return "", nil
 }

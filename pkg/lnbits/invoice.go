@@ -63,7 +63,8 @@ func (lnb *LNbits) CreateInvoice(invoiceKey, message string, amount int) (string
 	return resp.PaymentHash, resp.PaymentRequest, nil
 }
 
-func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (bool, error) {
+// PayInvoice returns after successful payment the payment hash -> should be the same Hash like from paymentRequest
+func (lnb *LNbits) PayInvoice(paymentRequest, adminKey string) (string, error) {
 
 	requestURL := lnb.Conf["host"] + lnb.Conf["paymentEp"]
 
@@ -77,12 +78,12 @@ func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (boo
 
 	payInvoiceJson, err := json.Marshal(payInvoice)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(payInvoiceJson))
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -90,13 +91,19 @@ func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (boo
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	defer res.Body.Close()
 
+	// LNbits throws for some errors no JSON but responds just with StatusInternalServerError.
+	// with already used Invoices -- but not for malformed invoices for example // todo: explore more cases
+	if res.StatusCode == http.StatusInternalServerError {
+		return "", errors.New("bad request to LNbits - please check Invoice")
+	}
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	type payInvoiceResponse struct {
@@ -108,13 +115,69 @@ func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (boo
 
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	// LNbits API returns detail field incase an error occurs otherwise it's empty
 	if resp.Detail != "" {
-		return false, errors.New(resp.Detail)
+		return "", errors.New(resp.Detail) // raw err from LNbits
 	}
 
-	return paymentHash == resp.PaymentHash, nil
+	return resp.PaymentHash, nil
 }
+
+// func (lnb *LNbits) PayInvoice(paymentRequest, paymentHash, adminKey string) (bool, error) {
+
+// 	requestURL := lnb.Conf["host"] + lnb.Conf["paymentEp"]
+
+// 	payInvoice := struct {
+// 		Out    bool   `json:"out"`
+// 		Bolt11 string `json:"bolt11"`
+// 	}{
+// 		Out:    true,
+// 		Bolt11: paymentRequest,
+// 	}
+
+// 	payInvoiceJson, err := json.Marshal(payInvoice)
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	req, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewBuffer(payInvoiceJson))
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Add("X-Api-Key", adminKey)
+
+// 	res, err := http.DefaultClient.Do(req)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	defer res.Body.Close()
+
+// 	body, err := ioutil.ReadAll(res.Body)
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	type payInvoiceResponse struct {
+// 		PaymentHash string `json:"payment_hash"`
+// 		Detail      string `json:"detail"`
+// 	}
+
+// 	var resp payInvoiceResponse
+
+// 	err = json.Unmarshal(body, &resp)
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	// LNbits API returns detail field incase an error occurs otherwise it's empty
+// 	if resp.Detail != "" {
+// 		return false, errors.New(resp.Detail)
+// 	}
+
+// 	return paymentHash == resp.PaymentHash, nil
+// }

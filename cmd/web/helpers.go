@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -62,6 +63,7 @@ func (app *app) isAuthorized(guideId int, w http.ResponseWriter, r *http.Request
 // upvoteGuide sends a Payment to the author of a guide
 // 1. create Invoice (author)
 // 2. pay Invoice (Upvoter)
+// 3. update DB
 func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 
 	// get InvoiceKey from author of the guide
@@ -89,25 +91,38 @@ func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 		return err
 	}
 
-	// paymentHash and PaymentRequest needed to pay Invoice
-	ph, pr, err := app.lnProvider.CreateInvoice(ik, "upvote", amount)
+	// PaymentRequest needed to pay Invoice
+	phIn, pr, err := app.lnProvider.CreateInvoice(ik, "upvote", amount)
 	if err != nil {
 		return err
 	}
 
 	// pay invoice with user who is currently logged in
-	isPayed, err := app.lnProvider.PayInvoice(pr, ph, ak)
-
-	// todo: Refactor this part: cleaner err handling with API errors
-	if isPayed {
-		// after payment add it to the Upvote amount of the guide
-		err = app.guides.AddToUpvotes(gid, amount)
-		if err != nil {
-			return err
-		}
-		err = app.guides.AddToUpvoteUserCount(gid, payer)
-		return err // should return nil
-	} else {
-		return err // info: this error is directly from LNbits api - Detail field
+	phOut, err := app.lnProvider.PayInvoice(pr, ak)
+	if err != nil {
+		return err
 	}
+
+	// compare payment hashes from created and payed invoice // have to be equal for successful payment
+	if phIn != phOut {
+		return errors.New("payment hashes are not equal")
+	}
+
+	// payment successful when reached to this point - errors below are only in DB not but payment related...
+	// todo: better to put them directly into the handlers?
+	err = app.guides.AddToUpvotes(gid, amount)
+	if err != nil {
+		app.session.Put(r, "flashMsg", "upvote successful but cannot be shown at the moment")
+		app.infoLog.Println(err)
+		return nil // return a nil err hence upvote was successful
+	}
+
+	err = app.guides.AddToUpvoteUserCount(gid, payer)
+	if err != nil {
+		app.session.Put(r, "flashMsg", "upvote successful but cannot be shown at the moment")
+		app.infoLog.Println(err)
+		return nil // return a nil err hence upvote was successful
+	}
+
+	return nil
 }
