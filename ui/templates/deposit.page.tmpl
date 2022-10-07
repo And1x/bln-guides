@@ -1,0 +1,55 @@
+{{template "base" .}}
+{{define "title"}}Profile{{end}}
+
+{{define "body"}}
+<div class="container">
+
+    {{with .StringMap.Invoice}}
+    <div class="invoice">
+        <label for="invoiceQR">Please deposit to this address:</label>
+        <div id="invoiceQR"></div>
+        <div class="invoice-copy">
+            <input class="inputfield" id="invoiceString" type="text" disabled value="{{.}}">
+            <button class="button" onclick="jsCopy()">copy</button>
+        </div>
+
+    </div>
+    {{end}}
+
+    {{with .StringMap.Balance}} 
+    <div class="mb5">
+        Balance: {{.}}
+    </div>
+    {{end}}
+    <form method="POST" action="/user/deposit">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        {{with .Form}}
+            <label for="deposit">Deposit:</label>
+            {{with .Errors.Get "deposit"}}
+                <label class="error">{{.}}</label>
+            {{end}}
+            <input class="inputfield" type="number" name="deposit" id="deposit" value="0">
+            
+            <button class="button" type="submit" name="submitDeposit" value="deposit">Fund</button>
+        {{end}}
+    </form>
+</div>
+{{end}}
+
+{{define "js"}}
+        {{/* JS generate QR Code from invoice String  */}}
+        <script type="text/javascript" src="/static/js/qrcode.min.js"></script>
+        <script type="text/javascript">
+        var qrcode = new QRCode(document.getElementById("invoiceQR"), {
+            width: 512,
+            height: 512
+        });
+        qrcode.makeCode("{{.StringMap.Invoice}}")
+
+        {{/* JS function to copy invoice String  */}}
+        function jsCopy(){
+            var copyText = "{{.StringMap.Invoice}}";
+            navigator.clipboard.writeText(copyText)
+        }
+</script>
+{{end}}

@@ -11,7 +11,7 @@ import (
 
 // CreateInvoice return a payment-Hash and BOLT11 payment-Request
 // invoiceKey is from the author of the guide that gets an upvote
-func (lnb *LNbits) CreateInvoice(invoiceKey string, amount int) (string, string, error) {
+func (lnb *LNbits) CreateInvoice(invoiceKey, message string, amount int) (string, string, error) {
 
 	requestURL := lnb.Conf["host"] + lnb.Conf["paymentEp"]
 

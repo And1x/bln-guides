@@ -90,7 +90,7 @@ func (app *app) upvoteGuide(r *http.Request, guideId string) error {
 	}
 
 	// paymentHash and PaymentRequest needed to pay Invoice
-	ph, pr, err := app.lnProvider.CreateInvoice(ik, amount)
+	ph, pr, err := app.lnProvider.CreateInvoice(ik, "upvote", amount)
 	if err != nil {
 		return err
 	}

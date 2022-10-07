@@ -1,10 +1,20 @@
 {{template "base" .}}
-{{define "webln"}}{{end}}
 {{define "title"}}₿ @ Home{{end}}
 {{define "body"}}
-<h1>@home</h1><br>
-
-
-
+    <h1>@home</h1><br>
+        <div id="qrcode">QR COOD</div>
 {{end}}
+{{define "js"}}
+
+        <script type="text/javascript" src="/static/js/qrcode.min.js"></script>
+        <script type="text/javascript">
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            width: 256,
+            height: 256
+        });
+        qrcode.makeCode("https://www.gloomycorner.com")
+</script>
+{{end}}
+
+
 

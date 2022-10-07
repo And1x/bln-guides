@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{/* webln only on singleguides used rn*/}}
-    {{template "webln" .}}
+    {{block "webln" .}}{{end}}
 
      <link id="cssstyle" rel="stylesheet" href="/static/css/style.css"> 
     {{/* <link rel="stylesheet" href="/static/css/sys-dark-light.css"> Use sys settings for light/dark mode*/}}
@@ -51,11 +51,10 @@
 </main>
 
 <div class="footer">
-    <a class="github-icon" href="https://www.github.com"><img src="/static/img/GitHub-Mark-32px.png">Made by And1x</a>
+    <a class="github-icon" href="https://github.com/And1x/bln-guides"><img src="/static/img/GitHub-Mark-32px.png">Made by And1x</a>
 </div>
 
-{{block "js" .}}
-{{end}}
+{{block "js" .}}{{end}}
 <script src="/static/js/main.js"></script>
 <script>
 

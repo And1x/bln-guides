@@ -10,7 +10,7 @@ func (lnb *LNbits) GetBalance(invoiceKey string) (int, error) {
 	return 0, nil
 }
 
-func (lnb *LNbits) CreateInvoice(invoiceKey string, amount int) (string, string, error) {
+func (lnb *LNbits) CreateInvoice(invoiceKey, message string, amount int) (string, string, error) {
 	return "", "", nil
 }
 

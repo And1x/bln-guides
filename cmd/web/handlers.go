@@ -509,6 +509,56 @@ func (app *app) settingsUserPwHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (app *app) depositFormHandler(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, "deposit.page.tmpl", &TemplateData{Form: forms.New(nil)})
+}
+
+func (app *app) depositHandler(w http.ResponseWriter, r *http.Request) {
+
+	// validation part
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.IsPositiveNumber("deposit")
+	if !form.Valid() {
+		app.render(w, r, "deposit.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	depositAmount, err := strconv.Atoi(form.Get("deposit")) // todo: err check neccessary? form gets already with IsPositiveNumber checked
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// trigger deposit
+	// create invoice with amount from form
+	uid := app.authUserId(r)
+	ik, err := app.users.GetInvoiceKey(uid)
+	if err != nil {
+		app.serverError(w, err) // todo: or just render and show message with try later?
+		return
+	}
+
+	_, payReq, err := app.lnProvider.CreateInvoice(ik, "deposit", depositAmount)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// redirect with Payment Request -- todo: session or better use TemplateData?
+	// app.session.Put(r, "flashMsg", "Pay this Request:\n"+payReq)
+	// http.Redirect(w, r, "/user/deposit", http.StatusSeeOther)
+
+	app.render(w, r, "deposit.page.tmpl", &TemplateData{StringMap: map[string]string{"Invoice": payReq}})
+	// todo: give user some feedback when deposit was successful
+
+}
+
 // logoutUserHandler removes the UserID from the session -> user isn't authenticated anymore
 func (app *app) logoutUserHandler(w http.ResponseWriter, r *http.Request) {
 
