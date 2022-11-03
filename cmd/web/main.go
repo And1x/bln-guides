@@ -128,12 +128,12 @@ func main() {
 	port := os.Getenv("PORT")
 	// HTTP-Server
 	srv := &http.Server{
-		Addr:     port,
+		Addr:     ":" + port,
 		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
 
-	infoLog.Printf("Starting Server on Port %s", port)
+	infoLog.Printf("Starting Server on Port :%s", port)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
