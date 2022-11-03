@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/and1x/bln--h/pkg/forms"
-	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln-guides/pkg/forms"
+	"github.com/and1x/bln-guides/pkg/models"
 	"github.com/go-chi/chi/v5"
 )
 

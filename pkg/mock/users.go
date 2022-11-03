@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln-guides/pkg/models"
 )
 
 type UserModel struct{}

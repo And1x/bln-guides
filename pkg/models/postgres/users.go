@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln-guides/pkg/models"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )

@@ -1,4 +1,4 @@
-module github.com/and1x/bln--h
+module github.com/and1x/bln-guides
 
 go 1.18
 

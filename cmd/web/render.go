@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/forms"
-	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln-guides/pkg/forms"
+	"github.com/and1x/bln-guides/pkg/models"
 	"github.com/justinas/nosurf"
 )
 

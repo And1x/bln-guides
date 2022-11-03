@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/lnbits"
-	"github.com/and1x/bln--h/pkg/models"
-	"github.com/and1x/bln--h/pkg/models/postgres"
+	"github.com/and1x/bln-guides/pkg/lnbits"
+	"github.com/and1x/bln-guides/pkg/models"
+	"github.com/and1x/bln-guides/pkg/models/postgres"
 	"github.com/golangcollege/sessions"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -74,14 +74,14 @@ func main() {
 	session.Lifetime = 8 * time.Hour
 
 	// Setup DB Postgresql
-	host := os.Getenv("bln_pq_host")
-	port := os.Getenv("bln_pq_port")
-	user := os.Getenv("bln_pq_user")
-	password := os.Getenv("bln_pq_password")
-	dbname := os.Getenv("bln_pq_name")
+	pqhost := os.Getenv("PGHOST")
+	pqport := os.Getenv("PGPORT")
+	user := os.Getenv("PGUSER")
+	password := os.Getenv("PGPASSWORD")
+	dbname := os.Getenv("PGDATABASE")
 
 	connectPsql := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		pqhost, pqport, user, password, dbname)
 
 	db, err := openDB(connectPsql)
 	if err != nil {
@@ -125,14 +125,15 @@ func main() {
 		lnProvider:    &lnbits.LNbits{Conf: lnbitsConf},
 	}
 
+	port := os.Getenv("PORT")
 	// HTTP-Server
 	srv := &http.Server{
-		Addr:     ":8080",
+		Addr:     port,
 		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
 
-	infoLog.Println("Starting Server on Port :8080")
+	infoLog.Printf("Starting Server on Port %s", port)
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }

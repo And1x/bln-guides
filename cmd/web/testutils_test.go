@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/mock"
+	"github.com/and1x/bln-guides/pkg/mock"
 	"github.com/golangcollege/sessions"
 )
 

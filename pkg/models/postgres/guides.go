@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/and1x/bln--h/pkg/models"
+	"github.com/and1x/bln-guides/pkg/models"
 	"github.com/lib/pq"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
