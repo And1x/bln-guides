@@ -10,14 +10,14 @@
             {{with .Errors.Get "title"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="text" name="title" id="title" value='{{.Get "title"}}'>
+            <input class="inputfield mb1" type="text" name="title" id="title" value='{{.Get "title"}}'>
         </div>
         <div>
             <label for="content">Content:</label>
             {{with .Errors.Get "content"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <textarea class="inputfield" name="content" id="content" cols="96" rows="21">{{.Get "content"}}</textarea>
+            <textarea class="inputfield mb1" name="content" id="content" cols="96" rows="21">{{.Get "content"}}</textarea>
         </div>
 
         <div>

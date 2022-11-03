@@ -1,20 +1,15 @@
 {{template "base" .}}
 {{define "title"}}₿ @ Home{{end}}
 {{define "body"}}
-    <h1>@home</h1><br>
-        <div id="qrcode">QR COOD</div>
-{{end}}
-{{define "js"}}
+    <h1>About BLN-Guide:</h1>
+    <p>Create guides to help fellow Bitcoiners and earn Sats in Form of upvotes. No matter what topic it is.</p>
 
-        <script type="text/javascript" src="/static/js/qrcode.min.js"></script>
-        <script type="text/javascript">
-        var qrcode = new QRCode(document.getElementById("qrcode"), {
-            width: 256,
-            height: 256
-        });
-        qrcode.makeCode("https://www.gloomycorner.com")
-</script>
+    {{/* <div class="frontimage">
+        <img src="/static/img/bitcoin-digital-art-3.jpg" alt="bitcoin-digital-art-3">
+    </div> */}}
+
 {{end}}
+
 
 
 

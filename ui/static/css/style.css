@@ -124,6 +124,10 @@ a:hover {
 .title {
     text-decoration-line: underline;
 }
+.title:hover {
+    background-color: var(--bg-color);
+    color: var(--btn-hover-color);
+}
 
 .fullguide ul{
     background-color: var(--bg-color2);
@@ -144,6 +148,10 @@ a:hover {
     margin-top: 3px;
     border: none;
 }
+.github-icon img{
+    max-width: 25%;
+    height: auto;
+}
 
 .github-icon:hover {
     background-color: transparent;
@@ -153,7 +161,7 @@ a:hover {
 label {
     display: block;
     font-size: 1.5em;
-    text-align: center;
+    text-align: left;
 }
 
 .inputfield{
@@ -165,6 +173,7 @@ label {
   -webkit-transition: 0.5s;
   transition: 0.5s;
   outline: none;
+  font-size: inherit;
 }
 
 .inputfield:focus{
@@ -185,8 +194,31 @@ label {
     display: block;
 }
 
-.mb5 {
+.mb1 {
     margin-bottom: 1em;
+}
+
+/* || Error Msg. */
+.error {
+    color: red;
+    font-size: small;
+    /* border: 1px solid red; */
+}
+
+.wallet {
+    border: 2px solid green;
+    background-color: lightgreen;
+    padding: 0.5em 0.5em;
+    font-size: 1.5rem;
+    width: 420px;
+}
+.profile {
+    border: 2px solid gray;
+    padding: 0.5em 0.5em;
+    /* padding: calc(); */
+    background-color: lightgrey;
+    font-size: 1.5rem;
+    width: 420px;
 }
 
 img {

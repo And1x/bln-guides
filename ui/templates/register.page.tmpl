@@ -11,37 +11,36 @@
                 {{with .Errors.Get "name"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input class="inputfield" type="text" id="name" name="name" value='{{.Get "name"}}'>
+                <input class="inputfield mb1" type="text" id="name" name="name" value='{{.Get "name"}}'>
             </div>
             <div>
                 <label for="pw" >Password:</label>
                 {{with .Errors.Get "password"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input class="inputfield" type="password" id ="pw" name="password">
+                <input class="inputfield mb1" type="password" id ="pw" name="password">
             </div><br>
-            <div>Not required*</div>
+            <div>Additional Information:</div>
             <div>
                 <label for="lnaddr" >Lightning Address:</label>
                 {{with .Errors.Get "lnaddr"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input class="inputfield" type="text" id="lnaddr" name="lnaddr" value='{{.Get "lnaddr"}}'>
+                <input class="inputfield mb1" type="text" id="lnaddr" name="lnaddr" value='{{.Get "lnaddr"}}'>
             </div>
             <div>
                 <label for="email" >Email:</label>
                 {{with .Errors.Get "email"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input class="inputfield" type="text" id="email" name="email" value='{{.Get "email"}}'>
+                <input class="inputfield mb1" type="text" id="email" name="email" value='{{.Get "email"}}'>
             </div>
 
             <div>
-                <button class="button" type="submit" name="register" value="Register">Register</button>
+                <button class="button mb1" type="submit" name="register" value="Register">Register</button>
             </div>
 
             <div>
-                *<br>
                 Email is used for Password Recovery. <br>
                 Lightning Address is used to receive Sats for created Guides. <br>
             </div>

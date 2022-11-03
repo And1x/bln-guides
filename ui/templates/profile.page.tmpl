@@ -3,23 +3,20 @@
 
 {{define "body"}}
 <div class="container">
-    {{with .StringMap.Balance}} 
-    <div class="mb5">
-        Balance: {{.}}
+
+    <div class="wallet mb1">
+        {{with .StringMap.Balance}} 
+            <div class="mb1" > Wallet: {{.}} </div>
+        {{end}}
+        <a class="button" href="/user/deposit">deposit</a>
+        <a class="button"  href="/user/withdraw">withdraw</a>
     </div>
-    {{end}}
-    <div class="mb5">
-        <a href="/user/deposit">deposit ⍐⍐</a>
-    </div>
-        <div class="mb5">
-        <a href="/user/withdraw">withdraw ⍗⍗DEADLINK</a>
+    <div class="profile">
+        <div class="mb1">Profile:</div>      
+        <a class="button" href="/user/settings/password">change Password</a> 
+        <a class="button" href="/user/settings">Settings</a>
+         
     </div>
 
-    <div class="mb5">
-        <a href="/user/settings">Settings</a>
-    </div>
-    <div class="mb5">
-        <a href="/user/settings/password">change Password</a> 
-    </div>
 </div>
 {{end}}

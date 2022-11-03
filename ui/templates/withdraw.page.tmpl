@@ -5,7 +5,7 @@
 <div class="container">
 
     {{with .StringMap.Balance}} 
-    <div class="mb5">
+    <div class="mb1">
         Balance: {{.}}
     </div>
     {{end}}
@@ -16,7 +16,7 @@
             {{with .Errors.Get "withdraw"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="text" name="withdrawInvoice" id="withdrawInvoice">
+            <input class="inputfield mb1" type="text" name="withdrawInvoice" id="withdrawInvoice">
             
             <button class="button" type="submit" name="submitWithdraw" value="withdraw">Pay out</button>
         {{end}}

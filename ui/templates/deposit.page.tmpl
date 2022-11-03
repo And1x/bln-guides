@@ -17,7 +17,7 @@
     {{end}}
 
     {{with .StringMap.Balance}} 
-    <div class="mb5">
+    <div class="mb1">
         Balance: {{.}}
     </div>
     {{end}}
@@ -28,7 +28,7 @@
             {{with .Errors.Get "deposit"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="number" name="deposit" id="deposit" value="0">
+            <input class="inputfield mb1" type="number" name="deposit" id="deposit" value="0">
             
             <button class="button" type="submit" name="submitDeposit" value="deposit">Fund</button>
         {{end}}

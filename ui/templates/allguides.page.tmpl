@@ -20,10 +20,8 @@
             </form>
         </div>
     {{end}}
-    {{/* <a class="fullscreen-icon" href="/guide/{{.Id}}"><img src="/static/img/fullscreen.svg"></a> */}}
 
-    {{if eq .UserID $.AuthUserId }}
-        
+    {{if eq .UserID $.AuthUserId }} 
         <form action="/deleteguide" method="post">
             <input type="hidden" name="csrf_token" value="{{ $.CSRFToken }}">
             <input type="hidden" name="id" value="{{.Id}}">
@@ -34,7 +32,7 @@
     {{end}} 
     {{/* <a href="/guide/{{.Id}}"><button type="button">FullView</button></a>  */}}
     <div class="title-button-space"></div>
-    <a href="/guide/{{.Id}}"><h2 class="title">Title: {{.Title}}</h2></a>
+    <a class="title" href="/guide/{{.Id}}"><h2>{{.Title}}</h2></a>
 </div>
     {{.Content}} <br>
 <div class="guide-footer">

@@ -12,19 +12,19 @@
             {{with .Errors.Get "lnaddr"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="text" id="lnaddr" name="lnaddr" value="{{$.User.LNaddr}}">
+            <input class="inputfield mb1" type="text" id="lnaddr" name="lnaddr" value="{{$.User.LNaddr}}">
 
             <label for="email">Email Address:</label>
             {{with .Errors.Get "email"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="text" id="email" name="email" value="{{$.User.Email}}">
+            <input class="inputfield mb1" type="text" id="email" name="email" value="{{$.User.Email}}">
 
             <label for="upvote">Default upvote amount:</label>
             {{with .Errors.Get "upvote"}}
                 <label class="error">{{.}}</label>
             {{end}}
-            <input class="inputfield" type="text" id="upvote" name="upvote" value="{{$.User.Upvote}}">
+            <input class="inputfield mb1" type="text" id="upvote" name="upvote" value="{{$.User.Upvote}}">
 
             <button class="button" type="submit" name="save" value="Save">Save</button>
         {{end}}
