@@ -36,7 +36,7 @@ type app struct {
 	session       *sessions.Session
 	templateCache map[string]*template.Template
 	inProduction  bool
-	guides        interface { // GuidesModel in guides.go & mockguidesModel(for tests) satisfies interface guides hence it implements all methods
+	guides        interface { // todo: in case interface gets bigger - may be better to use composed interfaces
 		GetById(id int, inHtml bool) (*models.Guide, error)
 		GetUidByID(id int) (int, error)
 		GetAll() ([]*models.Guide, error)
@@ -52,8 +52,8 @@ type app struct {
 		UpdateByUid(id int, lnaddr, email, upvote string) error
 		UpdatePwByUid(id int, password string) error
 		GetById(id int) (*models.User, error)
-		GetInvoiceKey(id int) (string, error)                   // todo: needed? more in users.go
-		GetAdminKeyAndUpvoteAmount(id int) (string, int, error) // todo: needed? more in users.go
+		GetInvoiceKey(id int) (string, error)
+		GetAdminKeyAndUpvoteAmount(id int) (string, int, error)
 		Authenticate(name, password string) (int, error)
 	}
 	lnProvider interface {

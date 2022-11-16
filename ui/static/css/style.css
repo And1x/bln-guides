@@ -3,18 +3,13 @@ todo:
 - responsive forms - edit/create
 */
 
-:root {
-    /* --border-color: rgb(31, 29, 21); */
-    /* --bg-color: #b3d4b3a8;
-    --bg-color2: #b3d4b3;
-    --font-color: black; */
-   
+:root {   
     --bg-color: rgb(255, 255, 255);
     --bg-color2: rgb(245, 245, 245);
     --border-color: rgb(210, 210, 210);
     --font-color: #000000;
 
-    --btn-hover-color: orange;
+    --btn-hover-color: #FF9900;
 }
 
 @media (prefers-color-scheme: light) {
@@ -45,7 +40,13 @@ a {
 }
 /* todo: add a:hover effect and maybe a:after tooo */
 a:hover {
-    background-color: orange;
+    background-color: var(--btn-hover-color);
+}
+
+.flash-message {
+    border: 1px solid lightgray;
+    background-color: var(--btn-hover-color);
+    text-align: center;
 }
 
 .button {
@@ -177,14 +178,13 @@ label {
 }
 
 .inputfield:focus{
-  border: 3px solid orange;
+  border: 3px solid var(--btn-hover-color);
 }
 
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
-
     border-radius: 5px;
     background-color: var(--bg-color2);
     width: 80%;
@@ -205,18 +205,20 @@ label {
     /* border: 1px solid red; */
 }
 
+/* || Settings Page */
 .wallet {
     border: 2px solid green;
-    background-color: lightgreen;
+    /* background-color: lightgreen; */
     padding: 0.5em 0.5em;
     font-size: 1.5rem;
     width: 420px;
 }
 .profile {
     border: 2px solid gray;
+    /* background-color: lightgrey; */
     padding: 0.5em 0.5em;
     /* padding: calc(); */
-    background-color: lightgrey;
+    
     font-size: 1.5rem;
     width: 420px;
 }
