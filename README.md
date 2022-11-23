@@ -35,6 +35,8 @@
   - [x] render
 - [x] Day/Night mode based on system settings
 - [ ] Login with LNURL-Auth
+- [ ] Improve withdraw UX
+- [ ] Reset Password per Mail
 
 
 

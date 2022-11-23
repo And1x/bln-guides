@@ -14,11 +14,18 @@
                 <input class="inputfield mb1" type="text" id="name" name="name" value='{{.Get "name"}}'>
             </div>
             <div>
-                <label for="pw" >Password:</label>
-                {{with .Errors.Get "password"}}
+                <label for="pw1" >Password:</label>
+                {{with .Errors.Get "password1"}}
                     <label class="error">{{.}}</label>
                 {{end}}
-                <input class="inputfield mb1" type="password" id ="pw" name="password">
+                <input class="inputfield mb1" type="password" id ="pw1" name="password1">
+            </div>
+            <div>
+                <label for="pw2">Repeat Password:</label>
+                {{with .Errors.Get "password2"}}
+                    <label class="error">{{.}}</label>
+                {{end}}
+                <input class="inputfield mb1" type="password" id ="pw2" name="password2">
             </div><br>
             <div>Additional Information:</div>
             <div>

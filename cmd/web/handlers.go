@@ -215,29 +215,46 @@ func (app *app) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.New(r.PostForm)
-	form.Required("name", "password")
-	form.MinLength("password", 7)
+	form.Required("name", "password1", "password2")
+	form.MinLength("password1", 7)
+
+	// check if password and Repeat Password are the same
+	if form.Get("password1") != form.Get("password2") {
+		form.Errors.Add("password2", "password not the same")
+		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
+		return
+	}
+
+	name := form.Get("name")
+	password := form.Get("password1")
+	var lnaddr, email string
 
 	// add default LN- and Mail address if users leaves fields empty
 	// format: name + @example.com
 	if form.Get("lnaddr") == "" {
-		form.Set("lnaddr", form.Get("name")+"@example.com")
+		// form.Set("lnaddr", form.Get("name")+"@example.com")
+		lnaddr = name + "@example.com"
+	} else {
+		lnaddr = form.Get("lnaddr")
+		form.ValidMail("lnaddr")
 	}
 	if form.Get("email") == "" {
-		form.Set("email", form.Get("name")+"@example.com")
+		// form.Set("email", form.Get("name")+"@example.com")
+		email = name + "@example.com"
+	} else {
+		email = form.Get("email")
+		form.ValidMail("email")
 	}
 
-	form.ValidMail("lnaddr", "email")
+	// form.ValidMail("lnaddr", "email")
 
 	if !form.Valid() {
 		app.render(w, r, "register.page.tmpl", &TemplateData{Form: form})
 		return
 	}
 
-	name := form.Get("name")
-
 	// 2.Step
-	err = app.users.New(name, form.Get("password"), form.Get("lnaddr"), form.Get("email"))
+	err = app.users.New(name, password, lnaddr, email)
 
 	if err == models.ErrNameAlreadyUsed || err == models.ErrLnaddrAlreadyUsed || err == models.ErrEmailAlreadyUsed {
 		switch {
