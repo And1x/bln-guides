@@ -21,7 +21,6 @@ import (
 // load .env vars to get config settings
 // todo: extra config package with os.Lookup use if var doesn't exist or use CLI Arguments
 func init() {
-
 	if err := godotenv.Load(); err != nil {
 		if err := godotenv.Load("./../../.env"); err != nil { // todo: find better solution - only needed for testing
 			log.Print(".env File missing")

@@ -578,15 +578,6 @@ func (app *app) withdrawFormHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) withdrawHandler(w http.ResponseWriter, r *http.Request) {
 
-	err := r.ParseForm()
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	// todo: validate invoice before it gets sent to LNbits
-	invoice := r.Form.Get("withdrawInvoice")
-
 	// get adminKey
 	ak, _, err := app.users.GetAdminKeyAndUpvoteAmount(app.authUserId(r))
 	if err != nil {
@@ -594,10 +585,29 @@ func (app *app) withdrawHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+
+	// todo: validate invoice before it gets sent to LNbits
+	// current check is trough LNbits api err response - not reliable in case API err msg changes
+	invoice := form.Get("withdrawInvoice")
+
 	_, err = app.lnProvider.PayInvoice(invoice, ak)
 	if err != nil {
 		log.Println(err)
-		//app.serverError(w, err)
+
+		if strings.Contains(err.Error(), "BOLT11 string is invalid") || strings.Contains(err.Error(), "Bad bech32 checksum") { // err msg. from LNbits Api
+			form.Errors.Add("withdraw", "BOLT11 invoice is invalid")
+			app.render(w, r, "withdraw.page.tmpl", &TemplateData{Form: form})
+			return
+		}
+
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 

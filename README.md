@@ -11,10 +11,8 @@
 - Format guides in Markdown after [CommonMark](https://commonmark.org/) specification
 
 ## Tech-Stack
-- ServerSide: Go
 - Frontend: HTML/CSS/Javascript
-- Database: Postgresql
-- Wallet Management: LNbits
+- Backend: Go, PostgreSQL and LNbits
 
 ## Roadmap/ ToDo List:
 
@@ -22,7 +20,7 @@
 - [x] Add markdown
 - [x] Build basic CSS 
 - [x] Create DB and Forms to register users
-- [ ] Add basic Authentication
+- [x] Add basic Authentication
   - currently username + password
 - [x] Add LNbits 
   - [x] show balance

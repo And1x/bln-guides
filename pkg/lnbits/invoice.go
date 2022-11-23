@@ -24,7 +24,7 @@ func (lnb *LNbits) CreateInvoice(invoiceKey, message string, amount int) (string
 	}{
 		Out:    false,
 		Amount: amount,
-		Memo:   "Upvote",
+		Memo:   message,
 		Unit:   "sat",
 	}
 	newInvoiceJson, err := json.Marshal(newInvoice)
