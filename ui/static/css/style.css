@@ -221,23 +221,29 @@ label {
 /* || Settings Page */
 .wallet {
     border: 2px solid green;
-    /* background-color: lightgreen; */
+    border-radius: 15px;
+    box-shadow: 1px 1px green;
     padding: 0.5em 0.5em;
     font-size: 1.5rem;
-    width: 420px;
+    width: 350px;
+    margin-top: 12px;
 }
 
 .profile {
     border: 2px solid gray;
-    /* background-color: lightgrey; */
+    border-radius: 15px;
+    box-shadow: 1px 1px var(--border-color);
     padding: 0.5em 0.5em;
     font-size: 1.5rem;
-    width: 420px;
+    width: 350px;
+    margin-bottom: 12px;
 }
 
 .test-acc {
-    border: 2px solid gray;
-    background-color: lightgray;
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 1px 1px var(--border-color);
+    background-color: var(--bg-color2);
     padding: 0.5em 0.5em;
     font-size: 1rem;
     width: 280px;
